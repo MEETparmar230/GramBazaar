@@ -30,7 +30,7 @@ A simple platform helping rural communities easily find and access essential pro
 - **Database:** MongoDB (Mongoose ODM)  
 - **Authentication:** JWT-based with HttpOnly cookies  
 - **API Requests:** Axios  
-- **Deployment:** (Add if deployed, e.g., Vercel or Netlify)
+- **Deployment:** Vercel
 
 ---
 
@@ -38,7 +38,7 @@ A simple platform helping rural communities easily find and access essential pro
 
 1. Clone the repository  
    ```bash
-   git clone https://github.com/yourusername/village-kart.git
+   git clone https://github.com/MEETparmar230/GramBazaar
    cd village-kart
    ```
 
