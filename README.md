@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Village Kart - Mini Full-Stack Web App
 
-## Getting Started
+A simple platform helping rural communities easily find and access essential products like groceries, medicines, and tools.
 
-First, run the development server:
+---
 
+## 🌐 [Live App](https://villagekart.vercel.app)
+
+
+## Features
+
+- **User Authentication**: Signup and login with secure backend  
+- **Product Booking**: Select products and quantities, book them  
+- **User Dashboard**: View welcome message, bookings, and edit profile  
+- **Dynamic Products List**: Products fetched from backend API  
+- **Responsive UI**: Works well on mobile and desktop devices  
+- **Homepage Sections**:  
+  - Navbar (Logo, Home, Services, Products, Contact)  
+  - Our Services (5 service types with icons)  
+  - Available Products (6+ products with name, price, icon)  
+  - News & Updates (static headlines)  
+  - Contact Us (address, helpline, contact form)  
+
+---
+
+## Tech Stack
+
+- **Frontend:** Next.js (React.js) with Tailwind CSS  
+- **Backend:** Next.js API Routes (Node.js, Express-like)  
+- **Database:** MongoDB (Mongoose ODM)  
+- **Authentication:** JWT-based with HttpOnly cookies  
+- **API Requests:** Axios  
+- **Deployment:** (Add if deployed, e.g., Vercel or Netlify)
+
+---
+
+## Setup and Run Locally
+
+1. Clone the repository  
+   ```bash
+   git clone https://github.com/yourusername/village-kart.git
+   cd village-kart
+   ```
+
+2. Install dependencies
+  ```bash
+   pnpm install
+  ```
+
+3. Create a .env file in the root with the following variables:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+MONGODB_URI=your_mongo_connection_string
+JWT_SECRET=your_jwt_secret_key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Run the development server
+```bash
+pnpm dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+5. Open http://localhost:3000 in your browser
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## API Endpoints
 
-To learn more about Next.js, take a look at the following resources:
+GET /api/services - List service types
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+GET /api/products - List available products
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+POST /api/register - User registration
 
-## Deploy on Vercel
+POST /api/login - User login
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+GET /api/news - Static news headlines
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+POST /api/contact - Submit contact form
+
+POST /api/bookings - Create a booking (auth required)
+
+GET /api/bookings - Get user bookings (auth required)
+
+PUT /api/user - Update user profile (auth required)
+
+
+## License
+
+This project is for educational purposes only.

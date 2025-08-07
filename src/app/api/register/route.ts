@@ -32,9 +32,19 @@ export async function POST(req: NextRequest) {
       { message: "User registered successfully", userId: user._id },
       { status: 201 }
     );
-  } catch (error: any) {
-  console.error("Registration error:", error.response?.data || error.message);
-  alert(error.response?.data?.error || "Registration failed.");
-}
-
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Registration error:", error.message);
+      return NextResponse.json(
+        { error: "Registration failed: " + error.message },
+        { status: 500 }
+      );
+    } else {
+      console.error("Unknown error during registration.");
+      return NextResponse.json(
+        { error: "An unknown error occurred during registration." },
+        { status: 500 }
+      );
+    }
+  }
 }

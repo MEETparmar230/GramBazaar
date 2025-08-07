@@ -5,15 +5,13 @@ dotenv.config()
 
 const Url = process.env.MONGOURI || '';
 
-if(!Url){
-        throw new Error('MONGOURI is not defined in environment variables');
-    }
-
-    let isConnected = false;
+if (!Url) {
+  throw new Error('MONGOURI is not defined in environment variables');
+}
 
 export const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGOURI!)
+    await mongoose.connect(Url);
     console.log("MongoDB connected");
   } catch (error) {
     console.error("MongoDB connection failed:", error);
