@@ -72,7 +72,7 @@ export default function Dashboard() {
     if (loading) return <p className="text-center mt-10">Loading dashboard...</p>;
 
     return (
-        <div className="max-w-3xl mx-auto p-6 mt-8 bg-white shadow rounded">
+        <div className="max-w-3xl md:mx-auto lg:mx-auto mx-2  p-6 mt-8 bg-white shadow rounded-lg">
             <h1 className="text-2xl font-bold mb-4">Welcome, {user.name} 👋</h1>
             <p className="mb-6 text-gray-600">Email: {user.email}</p>
 

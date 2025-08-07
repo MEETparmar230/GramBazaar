@@ -65,7 +65,7 @@ export default function BookPage() {
   if (loading) return <p className="text-center mt-8">Loading products...</p>;
 
   return (
-    <div className="max-w-2xl mx-auto p-6 mt-6 bg-white shadow rounded">
+    <div className="max-w-2xl sm:mx-auto md:mx-auto mx-2 p-6 mt-6 bg-white shadow rounded">
       <h1 className="text-2xl font-bold mb-4">🛒 Book Products</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         {products.map((product) => (

@@ -7,19 +7,19 @@ import NewsCard from "@/components/NewsCard";
 
 export default function HomePage() {
   return (
-    <main className="md:w-3/4 md:mx-auto mx-4 flex flex-col gap-10 my-4">
-      <section id="services" className="bg-zinc-100 p-4 rounded-lg shadow">
+    <main className="w-fit md:mx-auto mx-4 flex flex-col gap-10 my-4">
+      <section id="services" className="bg-zinc-100 p-4 rounded-lg shadow " >
         <h2 className="text-2xl font-bold mb-2">Our Services</h2>
-        <div className="grid grid-cols-5 gap-4 ">
+        <div className="flex flex-wrap gap-7 justify-center items-center">
           {services.map((s) => (
             <ServiceCard key={s.name} {...s} />
           ))}
         </div>
       </section>
 
-      <section id="products" className="bg-zinc-100 p-4 rounded-lg mx-auto shadow">
+      <section id="products" className="bg-zinc-100 p-4 rounded-lg md:mx-auto lg:mx-auto sm-mx-2 shadow ">
         <h2 className="text-2xl font-bold mb-2">Available Products</h2>
-        <div className="grid grid-cols-5 gap-4">
+        <div className="flex flex-wrap gap-7 justify-center items-center">
           {products.map((p) => (
             <ProductCard key={p.name} {...p} />
           ))}

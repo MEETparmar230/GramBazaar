@@ -28,7 +28,7 @@ export default function ContactForm() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-2 mb-4">
+    <div className="max-w-md mx-auto mt-2 mb-4 px-4 py-2">
       <h2 className="text-2xl text-center mb-4 font-bold mb-4">Contact Us</h2>
       <p className="mb-2">📍 GramBazaar HQ, Village Center, India</p>
       <p className="mb-4">📞 Helpline: 1800-123-456</p>
