@@ -4,7 +4,7 @@ A simple platform helping rural communities easily find and access essential pro
 
 ---
 
-## 🌐 [Live App](https://villagekart.vercel.app)
+## 🌐 [Live App](https://gram-bazaar.vercel.app/)
 
 
 ## Features
