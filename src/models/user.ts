@@ -10,7 +10,12 @@ const userSchema = new mongoose.Schema(
         unique:true
     },
     password:String,
-    phone:String        
+    phone:String,
+    role:{
+        type:String,
+        enum:['user','admin'],
+        default:'user'
+    }      
 },{timestamps:true}
 )
 
