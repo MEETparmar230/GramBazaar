@@ -5,10 +5,10 @@ import axios from "axios";
 interface ProductCardProps {
   name: string;
   price: number;
-  icon: string;
+  imageUrl: string;
 }
 
-export default function ProductCard({ name, price, icon }: ProductCardProps) {
+export default function ProductCard({ name, price, imageUrl }: ProductCardProps) {
   const handleAddToCart = async () => {
     try {
       const res = await axios.post("/api/bookings", {
@@ -23,7 +23,7 @@ export default function ProductCard({ name, price, icon }: ProductCardProps) {
 
   return (
     <div className="bg-white shadow p-4 rounded-lg text-center w-48">
-      <img src={icon} alt={name} className="w-16 h-16 mx-auto mb-2" />
+      <img src={imageUrl} alt={name} className="w-16 h-16 mx-auto mb-2" />
       <p className="font-semibold">{name}</p>
       <p className="text-green-600 font-bold">₹{price}</p>
       <button
