@@ -3,10 +3,14 @@ import Product from '@/models/product'
 import { connectDB } from "@/lib/db";
 import cloudinary from "@/lib/cloudinary";
 
+// Define context type for params
+type RouteParams = {
+  params: { id: string };
+};
 
-
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-    const productId = params.id
+export async function GET(req: NextRequest, context: RouteParams) {
+  const params = context.params;
+  const productId = params.id
     await connectDB()
 
     try {
@@ -14,7 +18,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
         if (!product) {
 
-            return NextResponse.json({ message: "Can't find Product" }, { status: 401 })
+            return NextResponse.json({ message: "Can't find Product" }, { status: 404 })
 
         }
 
@@ -27,9 +31,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-
-    const productid = params.id;
+export async function PUT(req: NextRequest, context: RouteParams) {
+  const params = context.params;
+  const productId = params.id
     const product = await req.json()
 
     if (!product || Object.keys(product).length === 0) {
@@ -39,7 +43,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     await connectDB()
 
     try {
-        const updatedProduct = await Product.findByIdAndUpdate(productid, product, { new: true })
+        const updatedProduct = await Product.findByIdAndUpdate(productId, product, { new: true })
 
         if (!updatedProduct) {
             return NextResponse.json({ message: "Product not found" }, { status: 404 })
@@ -55,11 +59,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
 
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const id = params.id; 
+export async function DELETE(req: NextRequest, context: RouteParams) {
+  const params = context.params;
+  const id = params.id
 
   if (!id) {
     return NextResponse.json(
