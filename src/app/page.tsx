@@ -7,22 +7,33 @@ import ServiceCard from "@/components/ServiceCard";
 import NewsCard from "@/components/NewsCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Button } from "@/components/ui/button";
 
 interface ProductsType {
   name:string,
   price:number,
-  imageUrl:string
+  imageUrl:string,
+  _id:string
 }
 
 
 export default function HomePage() {
 
   const [products,setProducts] = useState<ProductsType[]>([])
+  const [role,setRole] = useState<"user"|"admin"|null>(null)
 
 useEffect( () =>{
   axios.get("/api/product")
   .then(res=>{setProducts(res.data)})
   .catch(err=>console.log(err))
+
+  axios.get("/api/profile")
+  .then((res)=>
+   setRole(res.data.user?.role==="admin"?"admin":"user")
+  )
+ .catch(err =>{ console.error(err)
+  setRole(null)
+ });
 },[])
 
 
@@ -41,9 +52,14 @@ useEffect( () =>{
         <h2 className="text-2xl font-bold mb-2">Available Products</h2>
         <div className="flex flex-wrap gap-7 justify-center items-center">
           {products.map((p) => (
-            <ProductCard key={p.name} {...p} />
+            <ProductCard key={p._id} {...p} role={role} />
           ))}
         </div>
+      <div className="flex items-center justify-center">
+        {role==="admin"&&(
+          <Button className="bg-green-600 hover:bg-green-700 mt-4 " onClick={()=>{window.location.href="/admin/products/add"}}>Add Product</Button>
+        )}
+      </div>
       </section>
 
        <section id="news" className='my-4 mx-2'>

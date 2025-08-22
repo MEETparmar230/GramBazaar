@@ -20,7 +20,7 @@ export default function BookPage() {
     const fetchProducts = async () => {
       try {
         const res = await axios.get('/api/product');
-        setProducts(res.data.products);
+        setProducts(res.data);
       } catch (err) {
         console.error('Failed to load products:', err);
       } finally {

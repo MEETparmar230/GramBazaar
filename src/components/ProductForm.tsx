@@ -30,6 +30,9 @@ const formSchema = z.object({
   imageUrl: z.string().min(2, {
     message: "Didn't get url from cloudinary"
   }),
+  imageId: z.string().min(2, {
+    message: "Didn't get url from cloudinary"
+  }),
   description: z.string()
 })
 
@@ -46,7 +49,8 @@ export default function ProductForm() {
 
   const router = useRouter();
 
-const [url,setUrl] = useState<string>("")
+  const [url, setUrl] = useState<string>("")
+  const [Id, setId] = useState<string>("")
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,7 +58,8 @@ const [url,setUrl] = useState<string>("")
       name: "",
       price: 0,
       imageUrl: '',
-      description:''
+      imageId: '',
+      description: ''
     },
   })
 
@@ -62,14 +67,14 @@ const [url,setUrl] = useState<string>("")
 
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    axios.post("/api/product",values)
-   .then((res)=>{
-    form.reset() 
-    setUrl('')
-    router.push('/')
-   })
-   .catch(err=>{console.log(err)})
-    
+    axios.post("/api/product", values)
+      .then((res) => {
+        form.reset()
+        setUrl('')
+        router.push('/')
+      })
+      .catch(err => { console.log(err) })
+
   }
 
   return (
@@ -122,7 +127,7 @@ const [url,setUrl] = useState<string>("")
           render={({ field }) => (
             <FormItem>
               <FormLabel>Product image</FormLabel>
-              
+
               <FormControl>
                 <div>
 
@@ -133,8 +138,12 @@ const [url,setUrl] = useState<string>("")
                         const info = (results as CloudinaryUploadResult).info
                         if (info?.secure_url) {
                           setUrl(info.secure_url)
+                          setId(info.public_id)
+
+                          form.setValue("imageUrl", info.secure_url)
+                          form.setValue("imageId", info.public_id)
+
                           console.log("uploaded", info.secure_url)
-                          field.onChange(info.secure_url)
                         }
                       }
                     }}
@@ -148,19 +157,19 @@ const [url,setUrl] = useState<string>("")
 
                 </div>
               </FormControl>
-            
+
               <FormMessage />
             </FormItem>
-            
+
           )}
         />
 
-         {url&&<CldImage className="bg-zinc-200 p-5"
+        {url && <CldImage className="bg-zinc-200 p-5"
           src={url}
           alt="nothing"
           width={100}
           height={100}
-          />}
+        />}
         <Button type="submit">Submit</Button>
       </form>
     </Form>

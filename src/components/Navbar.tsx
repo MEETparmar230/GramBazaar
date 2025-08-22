@@ -7,26 +7,26 @@ import axios from "axios";
 import { RiMenu2Fill } from "react-icons/ri";
 
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false); 
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await axios.get("/api/me");
-        setIsLoggedIn(res.data.isAuthenticated);
-      } catch (err) {
-        setIsLoggedIn(false);
-      }
-    };
-    checkAuth();
-  }, []);
+  const [menuOpen, setMenuOpen] = useState(false); 
+  const [role,setRole] = useState<"user"|"admin"|null>(null)
+
+useEffect(() => {
+  axios.get("/api/profile")
+    .then((res) => {
+      setRole(res.data.user.role ?? null);
+    })
+    .catch(() => {
+      setRole(null);
+    });
+}, []);
+
 
   const handleLogout = async () => {
     try {
       await axios.post("/api/logout");
       alert("Logged out!");
-      setIsLoggedIn(false);
+      setRole(null);
       window.location.href = "/";
     } catch (error) {
       alert("Logout failed.");
@@ -37,17 +37,23 @@ export default function Navbar() {
   <>
     <li><Link href="/">Home</Link></li>
 
-    {isLoggedIn && (
+    {(role==="user" || role==="admin") && (
       <li><Link href="/dashboard">Dashboard</Link></li>
     )}
 
     <li><Link href="/services">Services</Link></li>
     <li><Link href="/products">Products</Link></li>
     <li><Link href="/news">News</Link></li>
-    <li><Link href="/book">Cart</Link></li>
-    <li><Link href="/contact">Contact</Link></li>
+    {role==="user"  &&
+      (
+      <li><Link href="/book">Cart</Link></li>
 
-    {isLoggedIn ? (
+      )}
+
+    {(role==="user" || role===null) &&
+    (<li><Link href="/contact">Contact</Link></li>)}
+
+    {(role==="user" || role==="admin") ? (
       <li>
         <button onClick={handleLogout} className="hover:underline">Logout</button>
       </li>
