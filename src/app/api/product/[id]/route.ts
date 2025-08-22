@@ -3,14 +3,20 @@ import Product from '@/models/product';
 import { connectDB } from "@/lib/db";
 import cloudinary from "@/lib/cloudinary";
 
-export async function GET(req: NextRequest, context: any) {  // use `any` or leave untyped
-  const { params } = context;
-  const productId = params.id;
+// Define the context type
+interface ParamsContext {
+  params: {
+    id: string;
+  };
+}
+
+export async function GET(req: NextRequest, context: ParamsContext) {
+  const { id } = context.params;
 
   await connectDB();
 
   try {
-    const product = await Product.findById(productId);
+    const product = await Product.findById(id);
     if (!product) {
       return NextResponse.json({ message: "Can't find Product" }, { status: 404 });
     }
@@ -21,9 +27,8 @@ export async function GET(req: NextRequest, context: any) {  // use `any` or lea
   }
 }
 
-export async function PUT(req: NextRequest, context: any) {
-  const { params } = context;
-  const productId = params.id;
+export async function PUT(req: NextRequest, context: ParamsContext) {
+  const { id } = context.params;
   const product = await req.json();
 
   if (!product || Object.keys(product).length === 0) {
@@ -33,7 +38,7 @@ export async function PUT(req: NextRequest, context: any) {
   await connectDB();
 
   try {
-    const updatedProduct = await Product.findByIdAndUpdate(productId, product, { new: true });
+    const updatedProduct = await Product.findByIdAndUpdate(id, product, { new: true });
     if (!updatedProduct) {
       return NextResponse.json({ message: "Product not found" }, { status: 404 });
     }
@@ -44,9 +49,8 @@ export async function PUT(req: NextRequest, context: any) {
   }
 }
 
-export async function DELETE(req: NextRequest, context: any) {
-  const { params } = context;
-  const id = params.id;
+export async function DELETE(req: NextRequest, context: ParamsContext) {
+  const { id } = context.params;
 
   if (!id) {
     return NextResponse.json({ message: "Product ID not provided" }, { status: 400 });
