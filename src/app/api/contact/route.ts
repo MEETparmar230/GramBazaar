@@ -8,13 +8,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Name and message required' }, { status: 400 });
     }
 
-    // ✅ Here, you would normally save to MongoDB or another DB
-    // Example: await ContactModel.create({ name, message });
-
     console.log('Contact submission:', { name, message });
 
     return NextResponse.json({ success: true, message: 'Message received!' });
   } catch (err) {
+    console.log(err)
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
