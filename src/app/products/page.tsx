@@ -12,7 +12,7 @@ interface ProductsType {
   _id:string,
 }
 
-export default function page() {
+export default function Productspage() {
 
   const [products,setProducts] = useState<ProductsType[]>([])
   const [role,setRole] = useState<"user"|"admin"|null>(null)
