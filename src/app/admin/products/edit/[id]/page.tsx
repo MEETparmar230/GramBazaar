@@ -4,7 +4,7 @@
     import ProductEditForm from '@/components/ProductEditForm'
     import { useParams } from 'next/navigation'
 
-    export default function Page() {
+    export default function page() {
 
         const params = useParams()
         const id = params.id as string
