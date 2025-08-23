@@ -3,63 +3,70 @@ import Product from '@/models/product'
 import { connectDB } from "@/lib/db";
 import cloudinary from "@/lib/cloudinary";
 
-
-
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-    const productId = params.id
-    await connectDB()
-
-    try {
-        const product = await Product.findById(productId)
-
-        if (!product) {
-
-            return NextResponse.json({ message: "Can't find Product" }, { status: 404 })
-
-        }
-
-        return NextResponse.json({ message: "Product Fetched", product }, { status: 200 })
-    }
-    catch (err) {
-        console.error("Some error occured while fetching a product from database")
-        return NextResponse.json({ message: "Some error occured while fetching a product from database" }, { status: 500 })
-
-    }
+interface Contex {
+  params: Promise<{
+    id: string
+  }>
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest,context:Contex) {
+  const params = await context.params
+  const productId = params.id
+  await connectDB()
 
-    const productid = params.id;
-    const product = await req.json()
+  try {
+    const product = await Product.findById(productId)
 
-    if (!product || Object.keys(product).length === 0) {
-        return NextResponse.json({ message: "no data arrived to apu for update" }, { status: 400 })
+    if (!product) {
+
+      return NextResponse.json({ message: "Can't find Product" }, { status: 404 })
+
     }
 
-    await connectDB()
+    return NextResponse.json({ message: "Product Fetched", product }, { status: 200 })
+  }
+  catch (err) {
+    console.error("Some error occured while fetching a product from database")
+    return NextResponse.json({ message: "Some error occured while fetching a product from database" }, { status: 500 })
 
-    try {
-        const updatedProduct = await Product.findByIdAndUpdate(productid, product, { new: true })
+  }
+}
 
-        if (!updatedProduct) {
-            return NextResponse.json({ message: "Product not found" }, { status: 404 })
-        }
+export async function PUT(req: NextRequest, context:Contex) {
 
-        return NextResponse.json({ message: "Product Updated!!", product: updatedProduct }, { status: 200 })
+  const params = await context.params
+  const productid = params.id;
+  const product = await req.json()
+
+  if (!product || Object.keys(product).length === 0) {
+    return NextResponse.json({ message: "no data arrived to apu for update" }, { status: 400 })
+  }
+
+  await connectDB()
+
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(productid, product, { new: true })
+
+    if (!updatedProduct) {
+      return NextResponse.json({ message: "Product not found" }, { status: 404 })
     }
-    catch (err) {
-        console.error("Error while updating product", err)
-        return NextResponse.json({ message: "Failed to update Product" }, { status: 500 })
-    }
+
+    return NextResponse.json({ message: "Product Updated!!", product: updatedProduct }, { status: 200 })
+  }
+  catch (err) {
+    console.error("Error while updating product", err)
+    return NextResponse.json({ message: "Failed to update Product" }, { status: 500 })
+  }
 }
 
 
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context:Contex
 ) {
-  const id = params.id; 
+  const params = await context.params
+  const id = params.id;
 
   if (!id) {
     return NextResponse.json(
