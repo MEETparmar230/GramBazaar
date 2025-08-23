@@ -22,13 +22,13 @@ useEffect( () =>{
   .then(res=>{setProducts(res.data)})
   .catch(err=>console.log(err))
 
-  axios.get("/api/profile")
-  .then((res)=>
-   setRole(res.data.user?.role==="admin"?"admin":"user")
-  )
- .catch(err =>{ console.error(err)
-  setRole(null)
- });
+ axios.get("/api/profile")
+    .then((res) => {
+      setRole(res.data.user?.role ?? null);
+    })
+    .catch(() => {
+      setRole(null);
+    });
 },[])
 
 

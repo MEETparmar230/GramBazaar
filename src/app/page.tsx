@@ -29,7 +29,7 @@ useEffect( () =>{
 
   axios.get("/api/profile")
   .then((res)=>
-   setRole(res.data.user?.role==="admin"?"admin":"user")
+   setRole(res.data.user?.role ?? null)
   )
  .catch(err =>{ console.error(err)
   setRole(null)
