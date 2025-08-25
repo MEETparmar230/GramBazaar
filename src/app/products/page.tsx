@@ -1,6 +1,7 @@
 'use client'
 
 import ProductCard from '@/components/ProductCard'
+import { Button } from '@/components/ui/button'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 
@@ -42,6 +43,11 @@ useEffect( () =>{
                 ))}
               </div>
             </section>
+            <div className="flex items-center justify-center">
+                    {role==="admin"&&(
+                      <Button className="bg-green-600 hover:bg-green-700 mt-4 " onClick={()=>{window.location.href="/admin/products/add"}}>Add Product</Button>
+                    )}
+                  </div>
     </div>
   )
 }

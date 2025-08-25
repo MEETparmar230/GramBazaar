@@ -5,7 +5,7 @@ const serviceSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    imageUrl:{
+    imageId:{
         type:String,
         required:true
     }

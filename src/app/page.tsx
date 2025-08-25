@@ -15,17 +15,31 @@ interface ProductsType {
   imageUrl:string,
   _id:string
 }
-
+interface serviceType{
+  _id:string,
+  name:string,
+  imageId:string,
+}
 
 export default function HomePage() {
 
   const [products,setProducts] = useState<ProductsType[]>([])
   const [role,setRole] = useState<"user"|"admin"|null>(null)
+  const [services,setServices] = useState<serviceType[]>([])
+  
 
 useEffect( () =>{
   axios.get("/api/product")
   .then(res=>{setProducts(res.data)})
   .catch(err=>console.log(err))
+
+ axios.get("/api/services")
+    .then((res)=>{
+      setServices(res.data)
+    })
+    .catch((err)=>{
+      console.error(err)
+    })
 
   axios.get("/api/profile")
   .then((res)=>
@@ -43,9 +57,14 @@ useEffect( () =>{
         <h2 className="text-2xl font-bold mb-2">Our Services</h2>
         <div className="flex flex-wrap gap-7 justify-center items-center">
           {services.map((s) => (
-            <ServiceCard key={s.name} {...s} />
+            <ServiceCard key={s._id} {...s}  role={role}/>
           ))}
         </div>
+        <div className="flex items-center justify-center">
+        {role==="admin"&&(
+          <Button className="bg-green-600 hover:bg-green-700 mt-4 " onClick={()=>{window.location.href="/admin/services/add"}}>Add Service</Button>
+        )}
+      </div>
       </section>
 
       <section id="products" className="bg-zinc-100 p-4 rounded-lg shadow sm:mx-4 mx-2">
