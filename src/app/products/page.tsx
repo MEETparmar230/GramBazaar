@@ -9,7 +9,7 @@ import React, { useEffect, useState } from 'react'
 interface ProductsType {
   name:string,
   price:number,
-  imageUrl:string,
+  imageId:string,
   _id:string,
 }
 
@@ -19,7 +19,7 @@ export default function Productspage() {
   const [role,setRole] = useState<"user"|"admin"|null>(null)
 
 useEffect( () =>{
-  axios.get("/api/admin/product")
+  axios.get("/api/product")
   .then(res=>{setProducts(res.data)})
   .catch(err=>console.log(err))
 
