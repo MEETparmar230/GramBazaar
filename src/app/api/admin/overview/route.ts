@@ -2,7 +2,7 @@ import { connectDB } from '@/lib/db'
 import Product from '@/models/product'
 import User from '@/models/user'
 import Bookings from '@/models/booking'
-import News from '@/models/news' // Import your News model
+import News from '@/models/news'
 import { NextResponse } from 'next/server'
 import { Types } from 'mongoose'
 
@@ -37,6 +37,31 @@ interface NewsActivity {
   date: Date;
 }
 
+// Define interface for booking items from database
+interface BookingItemFromDB {
+  name: string;
+  price: number;
+  quantity: number;
+  _id?: Types.ObjectId;
+}
+
+// Define interface for populated user in booking
+interface PopulatedUser {
+  _id: Types.ObjectId;
+  name: string;
+  email: string;
+}
+
+// Define interface for booking document
+interface BookingDocument {
+  _id: Types.ObjectId;
+  user: PopulatedUser | null;
+  items: BookingItemFromDB[];
+  createdAt: Date;
+  updatedAt: Date;
+  // Add other fields if needed
+}
+
 type Activity = BookingActivity | UserActivity | NewsActivity;
 
 export async function GET() {
@@ -47,7 +72,7 @@ export async function GET() {
     const productCount = await Product.estimatedDocumentCount()
     const userCount = await User.estimatedDocumentCount()
     const bookingsCount = await Bookings.estimatedDocumentCount()
-    const newsCount = await News.estimatedDocumentCount() // Get news count
+    const newsCount = await News.estimatedDocumentCount()
 
     // Calculate revenue
     const revenueResult = await Bookings.aggregate([
@@ -70,7 +95,7 @@ export async function GET() {
     const recentBookings = await Bookings.find()
       .sort({ createdAt: -1 })
       .limit(5)
-      .populate('user', 'name email')
+      .populate('user', 'name email') as unknown as BookingDocument[];
 
     // Get recent user registrations (last 5)
     const recentUsers = await User.find()
@@ -95,12 +120,12 @@ export async function GET() {
         type: 'booking',
         id: bookingId,
         userName: booking.user?.name || 'Unknown User',
-        items: booking.items.map((item: any) => ({
+        items: booking.items.map((item: BookingItemFromDB) => ({
           name: item.name,
           quantity: item.quantity,
           price: item.price
         })),
-        totalAmount: booking.items.reduce((sum: number, item: any) => 
+        totalAmount: booking.items.reduce((sum: number, item: BookingItemFromDB) => 
           sum + (item.price * item.quantity), 0),
         date: booking.createdAt
       })
@@ -144,7 +169,7 @@ export async function GET() {
       productCount,
       userCount,
       bookingsCount,
-      newsCount, // Include news count in response
+      newsCount,
       revenue,
       activities
     }, { status: 200 })
