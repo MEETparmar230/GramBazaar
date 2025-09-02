@@ -16,7 +16,7 @@ interface ProductCardProps {
 export default function ProductCard({_id, name, price, imageId, role }: ProductCardProps) {
   const handleAddToCart = async () => {
     try {
-      const res = await axios.post("/api/admin/bookings", {
+      const res = await axios.post("/api/users/bookings", {
         items: [{ name, price, quantity: 1 }],
       });
 

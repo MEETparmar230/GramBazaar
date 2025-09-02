@@ -1,11 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import Booking from "@/models/booking";
-import jwt from "jsonwebtoken";
+import { connectDB } from '@/lib/db';
+import Booking from '@/models/booking';
+import { NextRequest, NextResponse } from 'next/server';
+import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || "secret";
+const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
-// Define a type for the JWT payload
 interface JwtPayload {
   userId: string;
 }
@@ -13,47 +12,69 @@ interface JwtPayload {
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
-    const token = req.cookies.get("token")?.value;
-    if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
-    const userId = decoded.userId;
-
-    const { items } = await req.json();
-
-    const booking = new Booking({ user: userId, items });
-    await booking.save();
-
-    return NextResponse.json({ message: "Booking successful", booking });
-  } catch (err) {
-    console.error("Booking error:", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
-  }
-}
-
-export async function GET(req: Request) {
-  try {
-    await connectDB();
-
-    const cookie = req.headers.get("cookie") || "";
-    const token = cookie
-      .split("; ")
-      .find((c) => c.startsWith("token="))
-      ?.split("=")[1];
-
+    // Get token from cookies
+    const token = req.cookies.get('token')?.value;
+    
     if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
     }
 
+    // Verify token
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
     const userId = decoded.userId;
 
-    const bookings = await Booking.find({ user: userId });
+    // Parse request body
+    const { items } = await req.json();
+    
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return NextResponse.json(
+        { error: 'Items array is required' },
+        { status: 400 }
+      );
+    }
 
-    return NextResponse.json({ bookings });
-  } catch (err) {
-    console.error("Error in GET bookings:", err);
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Calculate total amount
+    const totalAmount = items.reduce((total, item) => {
+      return total + (item.price * item.quantity);
+    }, 0);
+
+    // Create new booking
+    const booking = new Booking({
+      user: userId,
+      items,
+      totalAmount,
+      status: 'confirmed'
+    });
+
+    await booking.save();
+
+    // Populate user details for response
+    await booking.populate('user', 'name email');
+
+    return NextResponse.json(
+      { 
+        message: 'Booking created successfully', 
+        booking 
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error('Error creating booking:', error);
+    
+    if (error instanceof jwt.JsonWebTokenError) {
+      return NextResponse.json(
+        { error: 'Invalid token' },
+        { status: 401 }
+      );
+    }
+    
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
