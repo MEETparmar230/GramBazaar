@@ -19,7 +19,7 @@ export default function Productspage() {
   const [role,setRole] = useState<"user"|"admin"|null>(null)
 
 useEffect( () =>{
-  axios.get("/api/product")
+  axios.get("/api/admin/product")
   .then(res=>{setProducts(res.data)})
   .catch(err=>console.log(err))
 

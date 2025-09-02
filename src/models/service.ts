@@ -5,12 +5,13 @@ const serviceSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    description:String,
     imageId:{
         type:String,
         required:true
     }
 })
 
-const Service = mongoose.model("Service",serviceSchema)
+const Service = mongoose.models.Service || mongoose.model("Service", serviceSchema);
 
-export default mongoose.models.service || Service
+export default Service

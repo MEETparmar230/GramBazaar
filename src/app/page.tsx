@@ -8,11 +8,12 @@ import NewsCard from "@/components/NewsCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
+import Settings from "@/components/Settings";
 
 interface ProductsType {
   name:string,
   price:number,
-  imageUrl:string,
+  imageId:string,
   _id:string
 }
 interface serviceType{
@@ -88,6 +89,7 @@ useEffect( () =>{
       <section id="contact"  className="bg-zinc-100 p-4 rounded-lg shadow sm:mx-4 mx-2">
         <ContactForm />
       </section>
+
     </main>
   );
 }

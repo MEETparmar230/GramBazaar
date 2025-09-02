@@ -18,23 +18,8 @@ import { Input } from "@/components/ui/input"
 import axios from "axios";
 import { useState } from "react";
 import { useRouter } from "next/navigation"
+import { productSchema } from "@/lib/validations/products";
 
-
-const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-  price: z.number().min(0, {
-    message: "Price can't be Nagative"
-  }),
-  imageUrl: z.string().min(2, {
-    message: "Didn't get url from cloudinary"
-  }),
-  imageId: z.string().min(2, {
-    message: "Didn't get url from cloudinary"
-  }),
-  description: z.string()
-})
 
 
 type CloudinaryUploadResult = {
@@ -52,8 +37,8 @@ export default function ProductForm() {
   const [url, setUrl] = useState<string>("")
   const [Id, setId] = useState<string>("")
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof productSchema>>({
+    resolver: zodResolver(productSchema),
     defaultValues: {
       name: "",
       price: 0,
@@ -66,8 +51,8 @@ export default function ProductForm() {
   const preset: string = process.env.NEXT_PUBLIC_PRESET_NAME!
 
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    axios.post("/api/product", values)
+  function onSubmit(values: z.infer<typeof productSchema>) {
+    axios.post("/api/admin/product", values)
       .then((res) => {
         form.reset()
         setUrl('')

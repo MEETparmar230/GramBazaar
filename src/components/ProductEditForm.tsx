@@ -67,13 +67,13 @@ export default function ProductForm({ id }: { id: string }) {
                     imageId: product.imageId, 
                     description: product.description
                 })
-                setUrl(product.imageUrl)
+                setUrl(product.imageId)
             })
     }, [id])
 
 
     function onSubmit(values: z.infer<typeof formSchema>) {
-        axios.put(`/api/product/${id}`, values)
+        axios.put(`/api/admin/product/${id}`, values)
             .then((res) => {
                 form.reset()
                 setUrl('')

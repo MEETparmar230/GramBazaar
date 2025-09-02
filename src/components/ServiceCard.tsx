@@ -15,7 +15,7 @@ interface ServiceCardProps {
 export default function ServiceCard({name,_id,imageId,role}: ServiceCardProps ,) {
 
   const handleDelete = (id:string) =>{
-    axios.delete(`/api/services/${id}`)
+    axios.delete(`/api/admin/services/${id}`)
     .then(()=>console.log("service deleted"))
     .catch(err=>console.error(err))
   }

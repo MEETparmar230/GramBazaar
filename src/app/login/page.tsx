@@ -1,7 +1,7 @@
 "use client"
 
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -20,7 +20,6 @@ export default function LoginPage() {
     alert("Login failed.");
   }
 };
-
 
 
   return (

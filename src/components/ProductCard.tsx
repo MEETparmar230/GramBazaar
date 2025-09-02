@@ -1,21 +1,22 @@
 'use client'
 
 import axios from "axios";
+import { CldImage } from "next-cloudinary";
 
 
 interface ProductCardProps {
   _id:string;
   name: string;
   price: number;
-  imageUrl: string;
+  imageId: string;
  role: "user" | "admin" | null;}
 
 
 
-export default function ProductCard({_id, name, price, imageUrl, role }: ProductCardProps) {
+export default function ProductCard({_id, name, price, imageId, role }: ProductCardProps) {
   const handleAddToCart = async () => {
     try {
-      const res = await axios.post("/api/bookings", {
+      const res = await axios.post("/api/admin/bookings", {
         items: [{ name, price, quantity: 1 }],
       });
 
@@ -28,7 +29,7 @@ export default function ProductCard({_id, name, price, imageUrl, role }: Product
 
   const handleDelete = async (id:string) =>{
     try{
-      await axios.delete(`/api/product/${id}`)
+      await axios.delete(`/api/admin/product/${id}`)
       alert("Product deleted!");
     }
     catch(err){
@@ -38,7 +39,21 @@ export default function ProductCard({_id, name, price, imageUrl, role }: Product
 
   return (
     <div className="bg-white shadow p-4 rounded-lg text-center w-48">
-      <img src={imageUrl} alt={name} className="w-16 h-16 mx-auto mb-2" />
+      {imageId ? (
+        
+        <CldImage 
+          className="mx-auto w-auto h-20"
+          src={imageId}
+          alt={name || "Service image"}
+          width={100}
+          height={100}
+          
+        />
+      ) : (
+        <div className="bg-zinc-200 p-5 mx-auto w-24 h-24 flex items-center justify-center">
+          <span className="text-zinc-500 text-sm">No image</span>
+        </div>
+      )}
       <p className="font-semibold">{name}</p>
       <p className="text-green-600 font-bold">₹{price}</p>
      {role === "user" && (

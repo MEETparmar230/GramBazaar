@@ -4,8 +4,10 @@ const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
   price: { type: Number, required: true },
   description: String,
-  imageUrl:{ type:String ,required:true },
+  imageUrl:{ type:String },
   imageId:{ type:String ,required:true }
 });
 
-export default mongoose.models.Product || mongoose.model("Product", productSchema);
+
+const Product = mongoose.models.Product || mongoose.model("Product", productSchema);
+export default Product;

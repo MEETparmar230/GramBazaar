@@ -37,8 +37,11 @@ useEffect(() => {
   <>
     <li><Link href="/">Home</Link></li>
 
-    {(role==="user" || role==="admin") && (
+    {(role==="user") && (
       <li><Link href="/dashboard">Dashboard</Link></li>
+    )}
+     {(role==="admin") && (
+      <li><Link href="/admin/dashboard">Dashboard</Link></li>
     )}
 
     <li><Link href="/services">Services</Link></li>
@@ -46,7 +49,7 @@ useEffect(() => {
     <li><Link href="/news">News</Link></li>
     {role==="user"  &&
       (
-      <li><Link href="/book">Cart</Link></li>
+      <li><Link href="/cart">Cart</Link></li>
 
       )}
 

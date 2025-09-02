@@ -25,10 +25,12 @@ A simple platform helping rural communities easily find and access essential pro
 
 ## Tech Stack
 
-- **Frontend:** Next.js (React.js) with Tailwind CSS  
+- **Frontend:** Next.js (React.js) with Tailwind CSS,Shadcn
 - **Backend:** Next.js API Routes (Node.js, Express-like)  
+- **Validation:** zod
+- **ImageUpload:** Cloudiary
 - **Database:** MongoDB (Mongoose ODM)  
-- **Authentication:** JWT-based with HttpOnly cookies  
+- **Authentication:** JWT, bcrypt
 - **API Requests:** Axios  
 - **Deployment:** Vercel
 
