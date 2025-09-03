@@ -12,15 +12,14 @@ interface UpdateData {
   cancellationReason?: string;
 }
 
-// ✅ PATCH: Update booking status
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }   
 ) {
   try {
     await connectDB();
 
-    const { id } = params;
+    const { id } = await params; 
     const { status, cancellationReason }: UpdateData = await request.json();
 
     if (!validStatuses.includes(status)) {
@@ -47,15 +46,17 @@ export async function PATCH(
   }
 }
 
-// ✅ GET: Fetch single booking
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }  
 ) {
   try {
     await connectDB();
 
-    const booking = await Booking.findById(params.id)
+    const { id } = await params;
+
+    const booking = await Booking.findById(id)
       .populate("user", "name email")
       .populate("items.productId");
 
