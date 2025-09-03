@@ -74,31 +74,34 @@ export async function POST(req: NextRequest) {
   }
 }
 
-
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
 
-    const token = req.cookies.get('token')?.value;
+    const token = req.cookies.get("token")?.value;
     if (!token) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
     const userId = decoded.userId;
 
     const bookings = await Booking.find({ user: userId })
-      .populate('items.productId', 'name price') // optional: get product details
-      .sort({ createdAt: -1 }); // latest first
+      .populate("items.productId", "name price")
+      .sort({ createdAt: -1 });
 
     return NextResponse.json({ bookings }, { status: 200 });
-  } catch (error: any) {
-    console.error('Error fetching bookings:', error);
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
 
     if (error instanceof jwt.JsonWebTokenError) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
+    // Fallback without `any`
+    const message =
+      error instanceof Error ? error.message : "Internal server error";
+
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
