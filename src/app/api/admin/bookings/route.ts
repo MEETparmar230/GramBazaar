@@ -1,8 +1,12 @@
 // app/api/admin/bookings/route.ts
 import { connectDB } from "@/lib/db";
 import Booking from "@/models/booking";
-import User from "@/models/user"; // ✅ Import User model so it gets registered
 import { NextRequest, NextResponse } from "next/server";
+
+
+type BookingFilter = {
+  status?: string;
+};
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,13 +16,13 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status");
 
     // Build filter object
-    const filter: Record<string, any> = {};
+const filter: BookingFilter = {};
     if (status && status !== "All") {
       filter.status = status;
     }
 
     const bookings = await Booking.find(filter)
-      .populate("user", "name email") // ✅ Works now, User schema registered
+      .populate("user", "name email") 
       .sort({ createdAt: -1 });
 
     if (!bookings || bookings.length === 0) {

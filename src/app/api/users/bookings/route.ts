@@ -10,37 +10,38 @@ interface JwtPayload {
   userId: string;
 }
 
+interface BookingItemInput {
+  productId: string;
+  quantity: number;
+}
+
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
 
-    // Get token from cookies
-    const token = req.cookies.get('token')?.value;
+    const token = req.cookies.get("token")?.value;
     if (!token) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
-    // Verify token
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
     const userId = decoded.userId;
 
-    // Parse request body
-    const { items } = await req.json();
+    const { items }: { items: BookingItemInput[] } = await req.json();
+
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json({ error: 'Items array is required' }, { status: 400 });
+      return NextResponse.json({ error: "Items array is required" }, { status: 400 });
     }
 
-    // Get product IDs from request
-    const productIds = items.map((i: any) => i.productId);
+    const productIds = items.map((i) => i.productId);
     const dbProducts = await Product.find({ _id: { $in: productIds } });
 
     if (dbProducts.length === 0) {
-      return NextResponse.json({ error: 'No valid products found' }, { status: 400 });
+      return NextResponse.json({ error: "No valid products found" }, { status: 400 });
     }
 
-    // Build validated items
-    const validatedItems = items.map((i: any) => {
-      const product = dbProducts.find((p: any) => p._id.toString() === i.productId);
+    const validatedItems = items.map((i) => {
+      const product = dbProducts.find((p) => p._id.toString() === i.productId);
       if (!product) {
         throw new Error(`Invalid product: ${i.productId}`);
       }
@@ -52,33 +53,27 @@ export async function POST(req: NextRequest) {
       };
     });
 
-    // Create new booking
     const booking = new Booking({
       user: userId,
       items: validatedItems,
-      status: 'Pending', // default from your schema
+      status: "Pending",
     });
 
     await booking.save();
-    await booking.populate('user', 'name email');
+    await booking.populate("user", "name email");
 
-    return NextResponse.json(
-      { message: 'Booking created successfully', booking },
-      { status: 201 }
-    );
-  } catch (error: any) {
-    console.error('Error creating booking:', error);
+    return NextResponse.json({ message: "Booking created successfully", booking }, { status: 201 });
+  } catch (error) {
+    console.error("Error creating booking:", error);
 
     if (error instanceof jwt.JsonWebTokenError) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
 
 export async function GET(req: NextRequest) {
   try {

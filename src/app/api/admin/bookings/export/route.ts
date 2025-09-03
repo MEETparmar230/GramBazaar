@@ -9,6 +9,10 @@ interface BookingItem {
   price: number;
   quantity: number;
 }
+type BookingFilter = {
+  status?: string;
+};
+
 
 export async function GET(request: Request) {
   try {
@@ -18,7 +22,7 @@ export async function GET(request: Request) {
     const status = searchParams.get("status");
 
     // Build filter object
-    const filter: Record<string, any> = {};
+    const filter: BookingFilter = {};
     if (status && status !== "All") {
       filter.status = status;
     }

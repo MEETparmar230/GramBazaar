@@ -1,26 +1,33 @@
 import { connectDB } from "@/lib/db";
 import Booking from "@/models/booking";
-import User from "@/models/user"; // ✅ Needed for populate("user")
+import User from "@/models/user"; 
 import { NextResponse } from "next/server";
 
-const validStatuses = ["Pending", "Approved", "Rejected", "Completed", "Cancelled"];
+const validStatuses = ["Pending", "Approved", "Rejected", "Completed", "Cancelled"] as const;
 
-// ✅ PATCH: Update booking status
+type BookingStatus = (typeof validStatuses)[number];
+
+interface UpdateData {
+  status: BookingStatus;
+  cancellationReason?: string;
+}
+
+
 export async function PATCH(
   request: Request,
-  context: { params: { id: string } } // <-- FIXED signature
+  context: { params: { id: string } }
 ) {
   try {
     await connectDB();
 
     const { id } = context.params;
-    const { status, cancellationReason } = await request.json();
+    const { status, cancellationReason }: UpdateData = await request.json();
 
     if (!validStatuses.includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
 
-    const updateData: Record<string, any> = { status };
+    const updateData: UpdateData = { status };
     if (status === "Cancelled" && cancellationReason) {
       updateData.cancellationReason = cancellationReason;
     }
@@ -40,10 +47,10 @@ export async function PATCH(
   }
 }
 
-// ✅ GET: Fetch single booking
+
 export async function GET(
   request: Request,
-  context: { params: { id: string } } // <-- FIXED signature
+  context: { params: { id: string } }
 ) {
   try {
     await connectDB();
