@@ -40,8 +40,8 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const userRes = await axios.get('/api/user');
-                const bookingRes = await axios.get('/api/bookings');
+                const userRes = await axios.get('/api/users/user');
+                const bookingRes = await axios.get('/api/users/bookings');
 
                 setUser(userRes.data.user);
                 setBookings(bookingRes.data.bookings);
@@ -59,7 +59,7 @@ export default function Dashboard() {
 
     const handleUpdate = async () => {
         try {
-            await axios.put('/api/user', {
+            await axios.put('/api/users/user', {
                 name: editName,
                 phone: editPhone,
             });

@@ -14,17 +14,20 @@ interface ProductCardProps {
 
 
 export default function ProductCard({_id, name, price, imageId, role }: ProductCardProps) {
+  
   const handleAddToCart = async () => {
-    try {
-      const res = await axios.post("/api/users/bookings", {
-        items: [{ name, price, quantity: 1 }],
-      });
+  try {
+    const res = await axios.post("/api/users/bookings", {
+      items: [{ productId: _id, quantity: 1 }],
+    });
 
-      alert("Booking successful!");
-    } catch (err) {
-      alert("Failed to book product");
-    }
-  };
+    alert("Booking successful!");
+  } catch (err) {
+    alert("Failed to book product");
+    console.log(err);
+  }
+};
+
 
 
   const handleDelete = async (id:string) =>{

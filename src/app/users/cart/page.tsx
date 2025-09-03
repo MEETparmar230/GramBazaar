@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 
 interface Product {
+  _id: string;
   name: string;
   price: number;
   icon?: string;
@@ -23,6 +25,7 @@ export default function BookPage() {
         setProducts(res.data);
       } catch (err) {
         console.error('Failed to load products:', err);
+        toast.error('Failed to load products');
       } finally {
         setLoading(false);
       }
@@ -30,10 +33,10 @@ export default function BookPage() {
     fetchProducts();
   }, []);
 
-  const handleQuantityChange = (productName: string, quantity: number) => {
+  const handleQuantityChange = (productId: string, quantity: number) => {
     setSelectedItems((prev) => ({
       ...prev,
-      [productName]: quantity,
+      [productId]: quantity,
     }));
   };
 
@@ -41,28 +44,33 @@ export default function BookPage() {
     e.preventDefault();
 
     const itemsToBook = products
-      .filter((p) => selectedItems[p.name] > 0)
+      .filter((p) => selectedItems[p._id] > 0)
       .map((p) => ({
-        name: p.name,
-        price: p.price,
-        quantity: selectedItems[p.name],
+        productId: p._id,
+        quantity: selectedItems[p._id],
       }));
 
     if (itemsToBook.length === 0) {
-      alert('Please select at least one product with quantity.');
+      toast.error('Please select at least one product with quantity.');
       return;
     }
 
     try {
-      await axios.post('/api/bookings', { items: itemsToBook });
-      router.push('/dashboard?success=1');
+      await axios.post('/api/users/bookings', { items: itemsToBook });
+      toast.success('Booking successful!');
+      router.push('/users/dashboard?success=1');
     } catch (err) {
       console.error('Booking failed:', err);
-      alert('Failed to book products.');
+      toast.error('Booking failed, please try again.');
     }
   };
 
   if (loading) return <p className="text-center mt-8">Loading products...</p>;
+
+  const totalAmount = products.reduce((total, p) => {
+    const qty = selectedItems[p._id] || 0;
+    return total + p.price * qty;
+  }, 0);
 
   return (
     <div className="max-w-2xl sm:mx-auto md:mx-auto mx-2 p-6 mt-6 bg-white shadow rounded">
@@ -70,7 +78,7 @@ export default function BookPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {products.map((product) => (
           <div
-            key={product.name}
+            key={product._id}
             className="flex justify-between items-center border p-3 rounded"
           >
             <div>
@@ -80,17 +88,21 @@ export default function BookPage() {
             <input
               type="number"
               min={0}
-              value={selectedItems[product.name] || 0}
+              value={selectedItems[product._id] || 0}
               onChange={(e) =>
-                handleQuantityChange(product.name, parseInt(e.target.value) || 0)
+                handleQuantityChange(product._id, parseInt(e.target.value) || 0)
               }
               className="w-20 border rounded px-2 py-1"
             />
           </div>
         ))}
+        {totalAmount > 0 && (
+          <p className="font-semibold text-right">Total: ₹{totalAmount}</p>
+        )}
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          disabled={totalAmount === 0}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Book Selected Products
         </button>

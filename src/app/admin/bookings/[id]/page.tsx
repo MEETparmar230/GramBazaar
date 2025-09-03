@@ -1,15 +1,15 @@
-// app/admin/bookings/[id]/page.tsx
-'use client'
-import axios from 'axios';
-import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
+"use client";
+
+import { useEffect, useState } from "react";
+import axios, { AxiosError } from "axios";
+import { useParams } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 interface BookingItem {
+  _id: string;
   name: string;
   price: number;
   quantity: number;
-  _id: string;
 }
 
 interface BookingType {
@@ -23,6 +23,7 @@ interface BookingType {
   createdAt: string;
   updatedAt: string;
   status?: string;
+  cancellationReason?: string;
   shippingAddress?: {
     address: string;
     city: string;
@@ -30,164 +31,165 @@ interface BookingType {
     pincode: string;
   };
   paymentStatus?: string;
+  totalAmount?: number;
 }
 
-export default function BookingDetails() {
+export default function BookingDetailsPage() {
   const params = useParams();
-  const bookingId = params.id as string;
-  
+  const bookingId =
+    typeof params?.id === "string" ? params.id : Array.isArray(params?.id) ? params.id[0] : "";
+
   const [booking, setBooking] = useState<BookingType | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [updating, setUpdating] = useState(false);
+
+  // local state for status update
+  const [status, setStatus] = useState<string>("Pending");
+  const [cancellationReason, setCancellationReason] = useState<string>("");
 
   useEffect(() => {
-    if (bookingId) {
-      axios.get(`/api/admin/bookings/${bookingId}`)
-        .then(res => {
-          setBooking(res.data);
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error("Error fetching booking details:", err);
-          setError('Failed to load booking details');
-          setLoading(false);
-        });
-    }
+    if (!bookingId) return;
+    const fetchBooking = async () => {
+      try {
+        const res = await axios.get(`/api/admin/bookings/${bookingId}`);
+        setBooking(res.data);
+
+        if (res.data.status) setStatus(res.data.status);
+        if (res.data.cancellationReason) setCancellationReason(res.data.cancellationReason);
+      } catch (err) {
+        console.error("Error fetching booking:", err);
+        toast.error("Failed to fetch booking details");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBooking();
   }, [bookingId]);
 
-  const calculateTotal = (items: BookingItem[]) => {
-    return items.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const handleStatusUpdate = async () => {
+    if (!booking) return;
+
+    if (status === "Cancelled" && !cancellationReason.trim()) {
+      toast.error("Please provide a cancellation reason.");
+      return;
+    }
+
+    try {
+      setUpdating(true);
+      const res = await axios.patch(`/api/admin/bookings/${booking._id}`, {
+        status,
+        cancellationReason: status === "Cancelled" ? cancellationReason : undefined,
+      });
+      setBooking(res.data);
+      toast.success("Status updated successfully");
+    } catch (err) {
+      const axiosError = err as AxiosError<{ error: string }>;
+      console.error("Error updating status:", axiosError);
+      toast.error(axiosError.response?.data?.error || "Failed to update status");
+    } finally {
+      setUpdating(false);
+    }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (error || !booking) {
-    return (
-      <div className="container mx-auto p-4">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {error || 'Booking not found'}
-        </div>
-        <Link href="/admin/bookings" className="mt-4 inline-block text-blue-600 hover:text-blue-800">
-          &larr; Back to bookings
-        </Link>
-      </div>
-    );
-  }
+  if (loading) return <p className="p-4">Loading booking...</p>;
+  if (!booking) return <p className="p-4">Booking not found.</p>;
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="mb-4">
-        <Link href="/admin/bookings" className="text-blue-600 hover:text-blue-800">
-          &larr; Back to all bookings
-        </Link>
+    <div className="p-6 max-w-2xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6">Booking Details</h1>
+
+      {/* Customer */}
+      <div className="mb-4 border-b pb-2">
+        <h2 className="text-lg font-semibold">Customer</h2>
+        <p>{booking.user?.name || "User Deleted"}</p>
+        <p>{booking.user?.email || "N/A"}</p>
       </div>
 
-      <div className="bg-white shadow rounded-lg p-6">
-        <h1 className="text-2xl font-bold mb-6">Booking Details</h1>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Booking Information */}
-          <div>
-            <h2 className="text-lg font-semibold mb-3">Booking Information</h2>
-            <div className="space-y-2">
-              <p><span className="font-medium">Booking ID:</span> {booking._id}</p>
-              <p><span className="font-medium">Date:</span> {formatDate(booking.createdAt)}</p>
-              <p><span className="font-medium">Status:</span> 
-                <span className={`ml-2 px-2 py-1 rounded text-xs ${
-                  booking.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                  booking.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                  'bg-blue-100 text-blue-800'
-                }`}>
-                  {booking.status || 'Confirmed'}
-                </span>
-              </p>
-              <p><span className="font-medium">Payment Status:</span> 
-                <span className={`ml-2 px-2 py-1 rounded text-xs ${
-                  booking.paymentStatus === 'completed' ? 'bg-green-100 text-green-800' :
-                  booking.paymentStatus === 'failed' ? 'bg-red-100 text-red-800' :
-                  'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {booking.paymentStatus || 'Pending'}
-                </span>
-              </p>
-            </div>
-          </div>
+      {/* Items */}
+      <div className="mb-4 border-b pb-2">
+        <h2 className="text-lg font-semibold">Items</h2>
+        <ul className="list-disc ml-6">
+          {booking.items.map((item) => (
+            <li key={item._id}>
+              {item.quantity} × {item.name} (₹{item.price})
+            </li>
+          ))}
+        </ul>
+      </div>
 
-          {/* Customer Information */}
-          <div>
-            <h2 className="text-lg font-semibold mb-3">Customer Information</h2>
-            {booking.user ? (
-              <div className="space-y-2">
-                <p><span className="font-medium">Name:</span> {booking.user.name}</p>
-                <p><span className="font-medium">Email:</span> {booking.user.email}</p>
-                <p><span className="font-medium">Customer ID:</span> {booking.user._id}</p>
-              </div>
-            ) : (
-              <p className="text-red-500">User account deleted</p>
-            )}
-          </div>
+      {/* Payment & total */}
+      <div className="mb-4 border-b pb-2">
+        <h2 className="text-lg font-semibold">Payment</h2>
+        <p>Status: {booking.paymentStatus || "N/A"}</p>
+        <p>Total: ₹{booking.totalAmount || 0}</p>
+      </div>
+
+      {/* Shipping address */}
+      {booking.shippingAddress && (
+        <div className="mb-4 border-b pb-2">
+          <h2 className="text-lg font-semibold">Shipping Address</h2>
+          <p>{booking.shippingAddress.address}</p>
+          <p>
+            {booking.shippingAddress.city}, {booking.shippingAddress.state} -{" "}
+            {booking.shippingAddress.pincode}
+          </p>
+        </div>
+      )}
+
+      {/* Current status */}
+      <div className="mb-4 border-b pb-2">
+        <h2 className="text-lg font-semibold">Current Status</h2>
+        <p>{booking.status || "Pending"}</p>
+      </div>
+
+      {/* Status update section */}
+      <div className="mt-6">
+        <h2 className="text-lg font-semibold mb-3">Update Status</h2>
+        <div className="flex space-x-2 mb-4">
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="border rounded p-2"
+          >
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+          <button
+            onClick={handleStatusUpdate}
+            disabled={updating || status === booking.status}
+            className={`px-4 py-2 rounded text-white ${
+              updating || status === booking.status
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600"
+            }`}
+          >
+            {updating ? "Updating..." : "Update"}
+          </button>
         </div>
 
-        {/* Shipping Address */}
-        {booking.shippingAddress && (
-          <div className="mt-6">
-            <h2 className="text-lg font-semibold mb-3">Shipping Address</h2>
-            <div className="space-y-1">
-              <p>{booking.shippingAddress.address}</p>
-              <p>{booking.shippingAddress.city}, {booking.shippingAddress.state} - {booking.shippingAddress.pincode}</p>
-            </div>
+        {status === "Cancelled" && (
+          <div>
+            <label className="block font-medium mb-1">Cancellation Reason</label>
+            <textarea
+              value={cancellationReason}
+              onChange={(e) => setCancellationReason(e.target.value)}
+              className="w-full border rounded p-2"
+              placeholder="Enter reason for cancellation"
+            />
           </div>
         )}
-
-        {/* Order Items */}
-        <div className="mt-6">
-          <h2 className="text-lg font-semibold mb-3">Order Items</h2>
-          <div className="border rounded">
-            {booking.items.map(item => (
-              <div key={item._id} className="flex justify-between items-center p-3 border-b last:border-b-0">
-                <div>
-                  <p className="font-medium">{item.name}</p>
-                  <p className="text-sm text-gray-600">₹{item.price} × {item.quantity}</p>
-                </div>
-                <p className="font-medium">₹{item.price * item.quantity}</p>
-              </div>
-            ))}
-            <div className="flex justify-between items-center p-3 bg-gray-50">
-              <p className="font-semibold">Total</p>
-              <p className="font-semibold">₹{calculateTotal(booking.items)}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="mt-6 flex space-x-4">
-          <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-            Update Status
-          </button>
-          <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
-            Cancel Order
-          </button>
-          <button className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
-            Print Invoice
-          </button>
-        </div>
       </div>
+
+      {/* Saved cancellation reason */}
+      {booking.status === "Cancelled" && booking.cancellationReason && (
+        <div className="mt-4 bg-gray-100 p-3 rounded">
+          <h3 className="font-semibold">Cancellation Reason:</h3>
+          <p>{booking.cancellationReason}</p>
+        </div>
+      )}
     </div>
   );
 }
