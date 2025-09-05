@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import Settings from './Settings';
 
 // Define TypeScript interfaces
 interface Stats {
@@ -86,26 +87,36 @@ const AdminDashboard = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Dashboard Overview</h1>
+      <h1 className="text-3xl font-bold text-zinc-800 mb-8">Dashboard Overview</h1>
       
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8 ">
+        <div className='ring-2 ring-green-200'>
         <StatCard title="Total Users" value={stats.users} icon="👥" color="blue" />
+        </div>
+        <div className='ring-2 ring-green-200'>
         <StatCard title="Total Products" value={stats.products} icon="📦" color="green" />
+        </div>
+        <div className='ring-2 ring-green-200'>
         <StatCard title="Total Bookings" value={stats.bookings} icon="📅" color="purple" />
+        </div>
+        <div className='ring-2 ring-green-200'>
         <StatCard title="Total News" value={stats.newsCount} icon="📰" color="red" />
+        </div>
+        <div className='ring-2 ring-green-200'>
         <StatCard title="Revenue" value={`₹${stats.revenue.toLocaleString()}`} icon="💰" color="yellow" />
+        </div>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 ">
         {/* Recent Activities */}
-        <div className="lg:col-span-2  rounded-md">
+        <div className="lg:col-span-2  rounded-md ring-2 ring-green-200">
           <div className="bg-white rounded-lg shadow p-6">
             <div className='sticky shadow-bottom'>
-              <h2 className="text-xl font-semibold text-gray-800 mb-2 border-b border-green-500 pb-2">Recent Activities</h2>
+              <h2 className="text-xl font-semibold text-zinc-800 mb-2 border-b border-green-500 pb-2">Recent Activities</h2>
             </div>
             
-            <div className="space-y-4 h-128 overflow-y-scroll">
+            <div className="space-y-4 h-195 overflow-y-scroll">
               {recentActivities.length > 0 ? (
                 recentActivities.map((activity, index) => (
                   <ActivityItem key={index} activity={activity} />
@@ -118,13 +129,15 @@ const AdminDashboard = () => {
         </div>
         
         {/* Quick Stats Charts */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Distribution</h2>
+        <div className="lg:col-span-1 ">
+          <div className="bg-white rounded-lg shadow p-6 mb-6 ring-2 ring-green-200">
+            <h2 className="text-xl font-semibold text-zinc-800 mb-4">Distribution</h2>
             <SimplePieChart stats={stats} />
           </div>
-          
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className='mb-6'>
+          <Settings/>
+          </div>
+          <div className="bg-white rounded-lg shadow p-6 ring-2 ring-green-200" >
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Quick Actions</h2>
             <div className="space-y-3">
               <button onClick={()=>{router.push("/admin/products/add")}} className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition duration-200">
@@ -136,11 +149,12 @@ const AdminDashboard = () => {
               <button onClick={()=>{router.push("/admin/users")}} className="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg transition duration-200">
                 Manage Users
               </button>
-              <button onClick={()=>{router.push("/admin/contactMessages")}} className="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg transition duration-200">
+              <button onClick={()=>{router.push("/admin/contactMessages")}} className="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-2 px-4 rounded-lg transition duration-200">
                 Messages
               </button>
             </div>
           </div>
+          
         </div>
       </div>
     </div>
@@ -149,7 +163,7 @@ const AdminDashboard = () => {
 
 const StatCard = ({ title, value, icon, color }: StatCardProps) => {
   const colorClasses = {
-    blue: 'bg-blue-100 text-blue-600',
+    blue: 'bg-blue-100 text-blue-600 ',
     green: 'bg-green-100 text-green-600',
     purple: 'bg-purple-100 text-purple-600',
     yellow: 'bg-yellow-100 text-yellow-600',
@@ -231,7 +245,7 @@ const SimplePieChart = ({ stats }: SimplePieChartProps) => {
   const bookingPercentage = total > 0 ? 100 - userPercentage - productPercentage : 0;
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center ">
       <div className="relative w-40 h-40 mb-4">
         <div className="absolute inset-0 rounded-full border-8 border-blue-500" 
              style={{ clipPath: `inset(0 0 0 ${100 - userPercentage}%)` }}></div>

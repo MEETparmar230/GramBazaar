@@ -7,9 +7,7 @@ import Settings from '@/components/Settings'
 export default function AdminDashboard() {
   return (
     <div className='w-3/4 mx-auto '>
-      <section><Overview/></section>
-      <section> <Settings /></section>
-     
+      <section><Overview/></section>     
     </div>
   )
 }

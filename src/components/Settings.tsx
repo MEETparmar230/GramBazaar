@@ -56,10 +56,10 @@ export default function Settings() {
     }, [form])
     return (
 
-        <div className='bg-zinc-100 p-5 rounded-lg w-84 '>
+        <div className='bg-white p-5 rounded-lg  ring-2 ring-green-200'>
             <div className='flex items-center justify-between'>
              
-                    <h1 className='text-center font-semibold text-2xl'>Settings </h1>
+                    <h1 className='text-center font-semibold text-2xl text-zinc-800'>Settings </h1>
              
                 {edit && <FaRegWindowClose onClick={()=>{setEdit(false)}} className='  hover:text-zinc-100 text-green-600  text-xl hover:bg-green-600 bg-zinc-100  '/>}
 

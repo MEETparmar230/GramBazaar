@@ -1,10 +1,10 @@
 'use client'
 
 import { services } from "@/data/services";
-import ProductCard from "@/components/ProductCard";
+import ProductCard from "@/components/Product";
 import ContactForm from "@/components/ContactForm";
-import ServiceCard from "@/components/ServiceCard";
-import NewsCard from "@/components/NewsCard";
+import ServiceCard from "@/components/Service";
+import NewsCard from "@/components/News";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";

@@ -1,6 +1,6 @@
 'use client'
 
-import ServiceCard from '@/components/ServiceCard'
+import ServiceCard from '@/components/Service'
 import React from 'react'
 
 export default function ServicePage() {

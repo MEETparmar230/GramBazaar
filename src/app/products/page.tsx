@@ -1,6 +1,6 @@
 'use client'
 
-import ProductCard from '@/components/ProductCard'
+import ProductCard from '@/components/Product'
 
 
 export default function Productspage() {

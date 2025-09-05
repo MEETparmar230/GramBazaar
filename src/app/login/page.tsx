@@ -23,9 +23,9 @@ export default function LoginPage() {
 
 
   return (
- <div className="flex items-center justify-center  mt-5">
-  <div className="bg-zinc-100 p-8 rounded-lg shadow-lg w-full max-w-md mx-4">
-    <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Login</h2>
+ <div className="flex items-center justify-center  mt-5 ">
+  <div className="bg-zinc-100 p-8 rounded-lg shadow-lg w-full max-w-md mx-4 ring-2 ring-green-200">
+    <h2 className="text-3xl font-bold mb-8 text-center text-zinc-700">Login</h2>
 
     <input
       type="email"

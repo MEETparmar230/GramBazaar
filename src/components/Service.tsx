@@ -40,29 +40,29 @@ export default function ServiceCard() {
     <div className=" sm:mx-auto md:mx-auto  md:w-3/4  mx-2l">
       <section
         id="services"
-        className="bg-zinc-100  rounded-lg shadow-md  p-5"
+        className="bg-zinc-100  rounded-lg shadow-md  p-5 ring-2 ring-green-200"
       >
         <h2 className="text-3xl text-zinc-700 font-bold m-2 ">Our Services</h2>
-        <div className="flex flex-wrap gap-7 justify-center items-center mb-5">
+        <div className="flex flex-wrap gap-10 justify-center items-center mb-5 ">
           {services.map((s) => (
             <div
               key={s._id}
-              className="bg-white shadow-md p-4 rounded-lg text-center min-w-60"
+              className="bg-white shadow-md p-4 my-5 rounded-lg text-center min-w-60 ring-3 ring-green-200"
             >
               {s.imageId ? (
                 <CldImage
-                  className="p-5  mx-auto w-70 h-70 object-contain"
+                  className="p-5  mx-auto w-65 h-65 object-contain"
                   src={s.imageId}
                   alt={s.name || "Service image"}
-                  width={150}
-                  height={150}
+                  width={130}
+                  height={130}
                 />
               ) : (
                 <div className="bg-zinc-200 p-5 mx-auto w-24 h-24 flex items-center justify-center">
                   <span className="text-zinc-500 text-sm">No image</span>
                 </div>
               )}
-              <p className="font-semibold text-zinc-700">{s.name}</p>
+              <p className="font-semibold text-lg text-zinc-700">{s.name}</p>
 
               {role === "admin" && (
                 <div>

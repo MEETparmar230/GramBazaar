@@ -50,7 +50,7 @@ export default function ContactForm() {
 
  
   return (
-    <div className=" mx-auto  bg-zinc-100 rounded-lg w-3xl shadow py-6 px-10">
+    <div className=" mx-auto  bg-zinc-100 rounded-lg w-3xl shadow py-6 px-10 ring-3 ring-green-200">
       <h2 className="text-3xl text-center mb-6 font-bold mb-4 text-zinc-900">Contact Us</h2>
       <p className="mb-2 text-lg text-zinc-900 ">📍 <span className="text-green-600">GramBazaar HQ</span>, Village Center, India</p>
       <p className="mb-4 text-lg text-zinc-900 mb-8">📞 Helpline: 1800-123-456</p>

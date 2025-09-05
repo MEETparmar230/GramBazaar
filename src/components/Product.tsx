@@ -65,11 +65,11 @@ export default function ProductCard() {
 
   return (
     <div className=' sm:mx-auto md:mx-auto md:w-3/4  mx-2'>
-      <section id="products" className="bg-zinc-100 p-4 rounded-lg md:mx-auto lg:mx-auto sm-mx-2 shadow mx-2">
+      <section id="products" className="bg-zinc-100 p-4 rounded-lg md:mx-auto lg:mx-auto sm-mx-2 shadow mx-2 ring-2 ring-green-200">
         <h2 className="text-3xl text-zinc-700 font-bold m-2">Available Products</h2>
         <div className="flex flex-wrap gap-7 justify-center items-center m-5">
           {products.map((p)=>
-            <div key={p._id} className="bg-white shadow p-4 rounded-lg text-center w-60">
+            <div key={p._id} className="bg-white shadow p-4 rounded-lg text-center w-60 ring-3 ring-green-200">
             {p.imageId ? (
 
               <CldImage

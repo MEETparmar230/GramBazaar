@@ -51,12 +51,12 @@ export default function NewsCard() {
 
 
   return (
-    <div className="bg-zinc-100 p-6 rounded-xl max-w-3xl w-3xl mx-auto shadow">
+    <div className="bg-zinc-100 p-6 rounded-xl max-w-3xl w-3xl mx-auto shadow ring-2 ring-green-200">
       <h2 className="text-3xl font-bold mb-4 text-zinc-800 p-2">📰 News & Updates</h2>
       <div className="space-y-4">
         {news.map((n) => (
 
-          <div key={n._id} className="bg-white border-l-4 border-green-500 p-4 rounded shadow-sm flex justify-between">
+          <div key={n._id} className="bg-white border-l-4 border-green-500 p-4 rounded shadow-sm flex justify-between ring-3 ring-green-200">
             <div className="">
               <div>
                 <h3 className="text-lg font-semibold text-green-800">{n.title}</h3>

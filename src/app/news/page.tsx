@@ -1,6 +1,6 @@
 'use client'
 
-import NewsCard from '@/components/NewsCard'
+import NewsCard from '@/components/News'
 import React from 'react'
 
 export default function page() {
@@ -8,7 +8,7 @@ export default function page() {
   
   return (
     <div>
-      <section id="news" className='my-4 mx-2'>
+      <section className='mt-10'>
                 <NewsCard/>
       </section>
     </div>

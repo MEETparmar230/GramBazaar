@@ -27,8 +27,8 @@ export default function Page() {
   };
 
   return (
-    <div className="bg-zinc-100 p-8 rounded-lg shadow-lg sm:mx-auto md:mx-auto lg:mx-auto mx-2 max-w-md my-5">
-      <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Register</h2>
+    <div className="bg-zinc-100 p-8 rounded-lg shadow-lg sm:mx-auto md:mx-auto lg:mx-auto mx-2 max-w-md my-5 ring-2 ring-green-200">
+      <h2 className="text-3xl font-bold mb-8 text-center text-zinc-700">Register</h2>
 
       <input
         type="text"
