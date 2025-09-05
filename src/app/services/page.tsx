@@ -5,7 +5,7 @@ import React from 'react'
 
 export default function ServicePage() {
   return (
-    <div>
+    <div className='mt-10'>
       <ServiceCard/>
     </div>
   )
