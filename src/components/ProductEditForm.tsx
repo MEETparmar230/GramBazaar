@@ -57,7 +57,7 @@ export default function ProductForm({ id }: { id: string }) {
     const preset: string = process.env.NEXT_PUBLIC_PRESET_NAME!
 
     useEffect(() => {
-        axios.get(`/api/product/${id}`)
+        axios.get(`/api/admin/product/${id}`)
             .then((res) => {
                 const product = res.data.product
                 form.reset({

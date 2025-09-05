@@ -51,8 +51,8 @@ export default function NewsCard() {
 
 
   return (
-    <div className="bg-zinc-100 p-6 rounded-xl max-w-3xl w-xl mx-auto shadow">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">📰 News & Updates</h2>
+    <div className="bg-zinc-100 p-6 rounded-xl max-w-3xl w-3xl mx-auto shadow">
+      <h2 className="text-3xl font-bold mb-4 text-zinc-800 p-2">📰 News & Updates</h2>
       <div className="space-y-4">
         {news.map((n) => (
 
@@ -64,7 +64,7 @@ export default function NewsCard() {
                 {n.description && <p className="text-gray-700 mt-2">{n.description}</p>}
               </div>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 mt-auto mx-2">
               <div>
                 {role === "admin" && (
                 <Button className="bg-blue-600 hover:bg-blue-700  " onClick={() => { window.location.href = `/admin/news/edit/${n._id}` }}>Edit</Button>
@@ -82,9 +82,9 @@ export default function NewsCard() {
 
         ))}
       </div>
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center m-3">
         {role === "admin" && (
-          <Button className="bg-green-600 hover:bg-green-700 mt-4 " onClick={() => { window.location.href = "/admin/news/add" }}>Add News</Button>
+          <Button className="bg-green-600 text-lg  hover:bg-green-700 mt-4 " onClick={() => { window.location.href = "/admin/news/add" }}>Add News</Button>
         )}
       </div>
     </div>

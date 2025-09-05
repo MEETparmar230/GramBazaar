@@ -2,63 +2,100 @@
 
 import axios from "axios";
 import { CldImage } from "next-cloudinary";
+import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
 
-interface ServiceCardProps {
+interface ServiceType {
   _id: string;
   name: string;
-  imageId?: string;
-  description?: string;
-  role:"admin"|"user"|null
+  imageId: string;
 }
 
+export default function ServiceCard() {
+  const [services, setServices] = useState<ServiceType[]>([]);
+  const [role, setRole] = useState<"user" | "admin" | null>(null);
+  const router = useRouter();
 
-export default function ServiceCard({name,_id,imageId,role}: ServiceCardProps ,) {
+  useEffect(() => {
+    Promise.all([axios.get("/api/services"), axios.get("/api/profile")])
+      .then(([servicesRes, profileRes]) => {
+        setServices(servicesRes.data);
+        setRole(profileRes.data.user?.role ?? null);
+      })
+      .catch((err) => console.error(err));
+  }, []);
 
-  const handleDelete = (id:string) =>{
-    axios.delete(`/api/admin/services/${id}`)
-    .then(()=>console.log("service deleted"))
-    .catch(err=>console.error(err))
-  }
-  
+  const handleDelete = (id: string) => {
+    axios
+      .delete(`/api/admin/services/${id}`)
+      .then(() => {
+        setServices((prev) => prev.filter((s) => s._id !== id));
+      })
+      .catch((err) => console.error(err));
+  };
 
   return (
-  
     
-    <div className="bg-white shadow p-4 rounded-lg shadow-md text-center min-w-60">
-      {imageId ? (
-        
-        <CldImage 
-          className=" p-5 mx-auto w-auto h-40"
-          src={imageId}
-          alt={name || "Service image"}
-          width={100}
-          height={100}
-          
-        />
-      ) : (
-        <div className="bg-zinc-200 p-5 mx-auto w-24 h-24 flex items-center justify-center">
-          <span className="text-zinc-500 text-sm">No image</span>
-        </div>
-      )}
-      <p className="font-semibold">{name}</p>
-      {role === "admin" && (
-  <div>
-    <button
-      onClick={() => handleDelete(_id)}
-      className="mt-2 bg-red-500 hover:bg-red-600 text-white px-2 py-1 me-4 rounded-lg"
-    >
-      Delete
-    </button>
-    <button
-      onClick={() => { window.location.href = `/admin/services/edit/${_id}` }}
-      className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg"
-    >
-      Edit
-    </button>
-  </div>
-)}
-    </div>
-    
+    <div className=" sm:mx-auto md:mx-auto  md:w-3/4  mx-2l">
+      <section
+        id="services"
+        className="bg-zinc-100  rounded-lg shadow-md  p-5"
+      >
+        <h2 className="text-3xl text-zinc-700 font-bold m-2 ">Our Services</h2>
+        <div className="flex flex-wrap gap-7 justify-center items-center mb-5">
+          {services.map((s) => (
+            <div
+              key={s._id}
+              className="bg-white shadow-md p-4 rounded-lg text-center min-w-60"
+            >
+              {s.imageId ? (
+                <CldImage
+                  className="p-5  mx-auto w-70 h-70 object-contain"
+                  src={s.imageId}
+                  alt={s.name || "Service image"}
+                  width={150}
+                  height={150}
+                />
+              ) : (
+                <div className="bg-zinc-200 p-5 mx-auto w-24 h-24 flex items-center justify-center">
+                  <span className="text-zinc-500 text-sm">No image</span>
+                </div>
+              )}
+              <p className="font-semibold text-zinc-700">{s.name}</p>
 
+              {role === "admin" && (
+                <div>
+                  <button
+                    onClick={() => handleDelete(s._id)}
+                    className="mt-2 bg-red-500 hover:bg-red-600 text-white px-2 py-1 me-4 rounded-lg"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    onClick={() => router.push(`/admin/services/edit/${s._id}`)}
+                    className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg"
+                  >
+                    Edit
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center justify-center">
+        {role === "admin" && (
+          <Button
+            className="bg-green-600 text-lg hover:bg-green-700 m-4"
+            onClick={() => router.push("/admin/services/add")}
+          >
+            Add service
+          </Button>
+        )}
+      </div>
+      </section>
+
+      
+    </div>
   );
 }

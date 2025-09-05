@@ -136,6 +136,9 @@ const AdminDashboard = () => {
               <button onClick={()=>{router.push("/admin/users")}} className="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg transition duration-200">
                 Manage Users
               </button>
+              <button onClick={()=>{router.push("/admin/contactMessages")}} className="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg transition duration-200">
+                Messages
+              </button>
             </div>
           </div>
         </div>

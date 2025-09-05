@@ -48,7 +48,7 @@ export default function AddNews() {
       date: values.date.toISOString()
     }
   
-    axios.post("/api/news",dataToSend)
+    axios.post("/api/admin/news",dataToSend)
     .then((res)=>{
       console.log(res.data.message)
       form.reset({
