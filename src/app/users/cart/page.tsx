@@ -73,13 +73,14 @@ export default function BookPage() {
   }, 0);
 
   return (
-    <div className="max-w-2xl sm:mx-auto md:mx-auto mx-2 p-6 mt-6 bg-white shadow rounded">
-      <h1 className="text-2xl font-bold mb-4">🛒 Book Products</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="sm:mx-auto md:mx-auto mx-2 p-6 mt-6 bg-white w-3/4 shadow rounded ring-2 ring-green-200">
+      <h1 className="text-2xl font-bold mb-4 text-zinc-800">🛒 Book Products</h1>
+      <form onSubmit={handleSubmit} className="space-y-4  ">
+         <div className='grid grid-cols-4 gap-5'>
         {products.map((product) => (
           <div
             key={product._id}
-            className="flex justify-between items-center border p-3 rounded"
+            className="flex justify-between items-center border p-3 rounded ring-1 ring-green-200"
           >
             <div>
               <p className="font-semibold">{product.name}</p>
@@ -99,6 +100,7 @@ export default function BookPage() {
         {totalAmount > 0 && (
           <p className="font-semibold text-right">Total: ₹{totalAmount}</p>
         )}
+       </div>
         <button
           type="submit"
           disabled={totalAmount === 0}

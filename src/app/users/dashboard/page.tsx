@@ -72,31 +72,31 @@ export default function Dashboard() {
     if (loading) return <p className="text-center mt-10">Loading dashboard...</p>;
 
     return (
-        <div className="max-w-3xl md:mx-auto lg:mx-auto mx-2  p-6 my-4 bg-white shadow rounded-lg">
+        <div className="w-3/4 md:mx-auto lg:mx-auto mx-2  p-6 mt-10 mb-4 bg-white shadow rounded-lg ring-2 ring-green-200">
             <h1 className="text-2xl font-bold mb-4">Welcome, {user.name} 👋</h1>
             <p className="mb-6 text-gray-600">Email: {user.email}</p>
 
-            <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">📦 Your Bookings</h2>
+            <h2 className="text-lg font-semibold mb-3 flex items-center gap-2 text-zinc-800">📦 Your Bookings</h2>
 
             {bookings.length === 0 ? (
                 <p className="text-gray-500 mb-4">No bookings yet.</p>
             ) : (
-                <div className="space-y-4 mb-4">
+                <div className="space-y-4 mb-4 grid grid-cols-3 gap-5">
                     {bookings.map((booking, idx) => {
                         const merged = mergeItems(booking.items);
                         return (
                             <div
                                 key={idx}
-                                className="border rounded-md p-3 bg-white shadow-sm"
+                                className="border rounded-md px-3 py-1 bg-white shadow-sm ring-1 ring-green-200 h-full"
                             >
-                                <p className="text-xs text-gray-400 mb-2">Booking #{idx + 1}</p>
+                                <p className="text-md text-gray-400 mb-1">Booking #{idx + 1}</p>
                                 <ul className="divide-y divide-gray-100">
                                     {merged.map((item, i) => (
                                         <li
                                             key={i}
-                                            className="flex justify-between py-1 text-gray-800 text-sm"
+                                            className="flex justify-between py-1 text-gray-800 text-md"
                                         >
-                                            <span className="font-medium">{item.name}</span>
+                                            <span className="font-medium mt-1">{item.name}</span>
                                             <span>
                                                 ₹{item.price}
                                                 {item.quantity > 1 && ` × ${item.quantity}`}
@@ -105,7 +105,7 @@ export default function Dashboard() {
 
                                     ))}
                                 </ul>
-                                <p className="mt-1 text-right text-sm font-semibold">
+                                <p className="text-right text-md font-semibold">
                                     Total: ₹
                                     {merged.reduce(
                                         (total, item) => total + item.price * item.quantity,
@@ -117,29 +117,30 @@ export default function Dashboard() {
                     })}
                 </div>
             )}
-
-            <h2 className="text-xl font-semibold mb-2">✏️ Edit Profile</h2>
-            <div className="space-y-4">
+            <div className='ring-2 ring-green-200 px-2 w-2/4 mx-auto rounded my-5 '>
+            <h2 className="text-xl font-semibold mb-3 text-zinc-800 mt-10 p-4">✏️ Edit Profile</h2>
+            <div className="space-y-4 flex flex-col items-center">
                 <input
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
                     placeholder="Name"
-                    className="w-full border px-3 py-2 rounded"
+                    className="w-2/3 border px-3 py-2 rounded outline-none ring-1 ring-green-200 focus:ring-green-400"
                 />
                 <input
                     type="text"
                     value={editPhone}
                     onChange={(e) => setEditPhone(e.target.value)}
                     placeholder="Phone"
-                    className="w-full border px-3 py-2 rounded"
+                    className="w-2/3 border px-3 py-2 rounded outline-none ring-1 ring-green-200 focus:ring-green-400"
                 />
                 <button
                     onClick={handleUpdate}
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mb-2"
                 >
                     Update Profile
                 </button>
+            </div>
             </div>
         </div>
     );
