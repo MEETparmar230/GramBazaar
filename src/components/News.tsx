@@ -40,7 +40,8 @@ export default function NewsCard() {
       .catch((err) => {
         console.error("Error while fetching news", err.response?.data || err.message)
       })
-
+      .finally(()=>setLoading(false))
+      
     axios.get("/api/profile")
       .then(res => {
         setRole(res.data.user?.role ?? null)
@@ -49,7 +50,7 @@ export default function NewsCard() {
       .catch(err => {
         console.error(err.response?.data || err.message)
       })
-      .finally(()=>setLoading(false))
+     
   }, [])
 
 
