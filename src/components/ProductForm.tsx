@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -62,7 +61,7 @@ export default function ProductForm() {
         router.push('/products')
       })
       .catch(err => { console.log(err) })
-    setLoading(false)
+      .finally(()=>setLoading(false))
   }
 
   return (
@@ -145,7 +144,7 @@ export default function ProductForm() {
                         onUpload={() => setImageUploading(true)}
                         onSuccess={(results) => {
                           if (typeof results !== "string") {
-                            const info = (results as any).info;
+                            const info = (results as CloudinaryUploadResult).info;
                             if (info?.secure_url) {
                               setUrl(info.secure_url);
                               form.setValue("imageUrl", info.secure_url);
@@ -191,7 +190,7 @@ export default function ProductForm() {
           <div className="ms-auto w-fit">
           <Button type="submit" variant={"my"} size={"lg"} className="text-md">
             {loading ? 
-              "Submiting...":"Submit"
+              "Submitting...":"Submit"
             }
           </Button>
           </div>
