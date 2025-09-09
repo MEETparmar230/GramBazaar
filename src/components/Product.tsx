@@ -28,7 +28,7 @@ export default function Product() {
     axios.get("/api/product")
       .then(res => { setProducts(res.data) })
       .catch(err => console.log(err))
-      
+      .finally(()=>setLoading(false))
 
     axios.get("/api/profile")
       .then((res) => {
@@ -37,7 +37,7 @@ export default function Product() {
       .catch(() => {
         setRole(null);
       })
-      .finally(()=>setLoading(false))
+      
       
   }, [])
 
