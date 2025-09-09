@@ -3,6 +3,8 @@ import jwt from "jsonwebtoken";
 import { connectDB } from "@/lib/db";
 import User from "@/models/user";
 import bcrypt from "bcryptjs";
+import { loginSchema } from "@/lib/validations/login";
+import { error } from "console";
 
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 
@@ -13,10 +15,18 @@ export async function POST(req: NextRequest) {
 
     console.log("Login attempt for:", email);
 
+    const validation = loginSchema.safeParse({ email, password })
+
+    if(!validation.success){
+      console.error("Validation failed",validation.error)
+      return NextResponse.json({error:validation.error.issues},{status:400})
+    }
+
     const user = await User.findOne({ email: email.toLowerCase() });
     console.log("User found:", user);
 
     if (!user) {
+      console.warn("No user found for email:", email.toLowerCase());
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
@@ -24,6 +34,7 @@ export async function POST(req: NextRequest) {
     console.log("Password match:", isMatch);
 
     if (!isMatch) {
+      console.warn("Password mismatch for:", email);
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 

@@ -3,21 +3,15 @@ import Booking from "./booking";
 
 const userSchema = new mongoose.Schema(
   {
-    name: String,
-    email: {
-      type: String,
-      unique: true
-    },
-    password: String,
-    phone: String,
-    role: {
-      type: String,
-      enum: ['user', 'admin'],
-      default: 'user'
-    }      
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    phone: { type: String, required: true },
+    role: { type: String, enum: ['user', 'admin'], default: 'user' }
   },
   { timestamps: true }
 );
+
 
 // Correct middleware for handling user deletion
 userSchema.post('findOneAndDelete', async function(doc) {

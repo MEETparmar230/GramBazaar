@@ -16,9 +16,10 @@ export default function ContactMessagesPage() {
   const [messages, setMessages] = useState<MessageType[]>([])
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
-
+  const [fetching, setFetching] = useState(false)
   // ✅ Extracted fetch function
   async function fetchMessages() {
+    setFetching(true)
     try {
       const res = await axios.get("/api/admin/contact")
       if (res.data.success) {
@@ -30,10 +31,13 @@ export default function ContactMessagesPage() {
       console.error(err)
       toast.error("Failed to fetch messages")
     }
+    setFetching(false)
   }
 
   useEffect(() => {
+    
     fetchMessages()
+    
   }, [])
 
   // ✅ Delete one message
@@ -90,8 +94,17 @@ export default function ContactMessagesPage() {
     }
   }
 
+
+   if (fetching) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6">
+    <div className="md:p-6 py-4 mx-6 overflow-x-auto">
       <h1 className="text-2xl font-bold mb-4">Contact Messages</h1>
 
       <div className="mb-4 flex gap-2">

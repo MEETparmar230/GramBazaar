@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
@@ -41,14 +41,17 @@ export default function AddNews() {
       link: ""
     },
   })
+  const [loading, setLoading] = useState<boolean>(false)
 
   function onSubmit(values: NewsInput) {
+    setLoading(true)
      const dataToSend = {
       ...values,
       date: values.date.toISOString()
     }
   
     axios.post("/api/admin/news",dataToSend)
+    
     .then((res)=>{
       console.log(res.data.message)
       form.reset({
@@ -64,14 +67,16 @@ export default function AddNews() {
       } else {
         console.error("Request failed:", err);
       }
-    });
-
+    }
     
+  );
+
+    setLoading(false)
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-1/3 mx-auto my-5 bg-zinc-100 p-5 rounded-lg">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-1/3 mx-auto my-5 bg-zinc-100 p-5 rounded-lg ring-2 ring-green-200">
         <FormField
           control={form.control}
           name="title"
@@ -154,7 +159,11 @@ export default function AddNews() {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <div className='ms-auto w-fit'>
+        <Button type="submit" variant={"my"} className='text-md'>
+         {loading?"Submitting..." : "Submit"}
+          </Button>
+        </div> 
       </form>
     </Form>
   )

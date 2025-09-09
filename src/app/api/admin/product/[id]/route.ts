@@ -32,32 +32,42 @@ export async function GET(req: NextRequest,context:Contex) {
   }
 }
 
-export async function PUT(req: NextRequest, context:Contex) {
-
-  const params = await context.params
+export async function PUT(req: NextRequest, context: Contex) {
+  const params = await context.params;
   const productid = params.id;
-  const product = await req.json()
+  const newData = await req.json();
 
-  if (!product || Object.keys(product).length === 0) {
-    return NextResponse.json({ message: "no data arrived to apu for update" }, { status: 400 })
+  if (!newData || Object.keys(newData).length === 0) {
+    return NextResponse.json({ message: "No data arrived to API for update" }, { status: 400 });
   }
 
-  await connectDB()
+  await connectDB();
 
   try {
-    const updatedProduct = await Product.findByIdAndUpdate(productid, product, { new: true })
-
-    if (!updatedProduct) {
-      return NextResponse.json({ message: "Product not found" }, { status: 404 })
+    const existingProduct = await Product.findById(productid);
+    if (!existingProduct) {
+      return NextResponse.json({ message: "Product not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Product Updated!!", product: updatedProduct }, { status: 200 })
-  }
-  catch (err) {
-    console.error("Error while updating product", err)
-    return NextResponse.json({ message: "Failed to update Product" }, { status: 500 })
+    // If a new image is uploaded, delete the old one
+    if (newData.imageId && existingProduct.imageId && newData.imageId !== existingProduct.imageId) {
+      try {
+        await cloudinary.uploader.destroy(existingProduct.imageId);
+      } catch (cloudErr) {
+        console.error("Error deleting old Cloudinary image:", cloudErr);
+        // You can choose to continue without failing the update
+      }
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(productid, newData, { new: true });
+
+    return NextResponse.json({ message: "Product updated", product: updatedProduct }, { status: 200 });
+  } catch (err) {
+    console.error("Error while updating product", err);
+    return NextResponse.json({ message: "Failed to update product" }, { status: 500 });
   }
 }
+
 
 
 

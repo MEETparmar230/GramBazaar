@@ -2,11 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/db";
 import User from "@/models/user";
+import { signUpSchema } from "@/lib/validations/register";
 
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
-    const { name, email, password, phone } = await req.json();
+    const { name, email, password, phone ,confirmPassword} = await req.json();
+
+    const validation = signUpSchema.safeParse({name, email, password, phone,confirmPassword})
+
+    if(!validation.success){
+      console.error("validation failed",validation.error)
+      return NextResponse.json({error:"Validation failed"},{status:401})
+    }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });

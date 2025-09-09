@@ -86,11 +86,11 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-zinc-800 mb-8">Dashboard Overview</h1>
+    <div className="container mx-auto md:px-4 py-8 ">
+      <h1 className="md:text-3xl text-2xl font-bold text-zinc-800 mb-8 whitespace-nowrap">Dashboard Overview</h1>
       
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8 ">
+      <div className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(220px,1fr))] mb-8 ">
         <div className='ring-2 ring-green-200'>
         <StatCard title="Total Users" value={stats.users} icon="👥" color="blue" />
         </div>

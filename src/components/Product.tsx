@@ -16,17 +16,19 @@ interface ProductsType {
 }
 
 
-export default function ProductCard() {
+export default function Product() {
 
   const [products, setProducts] = useState<ProductsType[]>([])
   const [role, setRole] = useState<"user" | "admin" | null>(null)
   const router = useRouter()
+  const [loading, setLoading] = useState(true);
 
 
   useEffect(() => {
     axios.get("/api/product")
       .then(res => { setProducts(res.data) })
       .catch(err => console.log(err))
+      
 
     axios.get("/api/profile")
       .then((res) => {
@@ -34,12 +36,14 @@ export default function ProductCard() {
       })
       .catch(() => {
         setRole(null);
-      });
+      })
+      .finally(()=>setLoading(false))
+      
   }, [])
 
   const handleAddToCart = async (id:string) => {
     try {
-      const res = await axios.post("/api/users/bookings", {
+       await axios.post("/api/users/bookings", {
         items: [{ productId: id, quantity: 1 }],
       });
       router.push("/users/dashboard")
@@ -63,61 +67,81 @@ export default function ProductCard() {
     }
   }
 
+  function ProductSkeletonCard() {
   return (
-    <div className=' sm:mx-auto md:mx-auto md:w-3/4  mx-2'>
-      <section id="products" className="bg-zinc-100 p-4 rounded-lg md:mx-auto lg:mx-auto sm-mx-2 shadow mx-2 ring-2 ring-green-200">
-        <h2 className="text-3xl text-zinc-700 font-bold m-2">Available Products</h2>
-        <div className="flex flex-wrap gap-7 justify-center items-center m-5">
-          {products.map((p)=>
-            <div key={p._id} className="bg-white shadow p-4 rounded-lg text-center w-60 ring-3 ring-green-200">
-            {p.imageId ? (
+    <div className="bg-white shadow p-4 rounded-lg text-center ring-3 ring-green-200 animate-pulse">
+      <div className="bg-zinc-300 mx-auto w-full h-40 mb-4 rounded"></div>
+      <div className="h-4 bg-zinc-300 rounded w-3/4 mx-auto mb-2"></div>
+      <div className="h-4 bg-zinc-300 rounded w-1/2 mx-auto mb-4"></div>
+      <div className="h-8 bg-green-300 rounded w-full"></div>
+    </div>
+  );
+}
 
-              <CldImage
-                className="mx-auto w-40  h-40 object-contain"
-                src={p.imageId}
-                alt={p.name || "Service image"}
-                width={130}
-                height={130}
 
-              />
-            ) : (
-              <div className="bg-zinc-200 p-5 mx-auto w-24 h-24 flex items-center justify-center">
-                <span className="text-zinc-500 text-sm">No image</span>
-              </div>
-            )}
-            <p className="font-semibold">{p.name}</p>
-            <p className="text-green-600 font-bold">₹{p.price}</p>
-            {role === "user" && (
-              <button
-                onClick={()=>{handleAddToCart(p._id)}}
-                className="mt-2 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
-              >
-                Book Now
-              </button>
-            )}
+  return (
+    <div className='w-full'>
+      <section id="products" className="bg-zinc-100 p-4 w-full rounded-lg  shadow  ring-2 ring-green-200 mx-auto w-full">
+        <h2 className="md:text-3xl text-2xl text-zinc-700 font-bold m-2 ">Available Products</h2>
+        <div className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(220px,1fr))]">
+  {loading
+  ? Array.from({ length: 6 }).map((_, i) => <ProductSkeletonCard key={i} />)
+  : products.map((p) => (
+      <div
+        key={p._id}
+        className="bg-white shadow p-4 rounded-lg text-center ring-3 ring-green-200"
+      >
+        {p.imageId ? (
+          <CldImage
+            className="mx-auto w-full h-40 object-contain"
+            src={p.imageId}
+            alt={p.name || "Service image"}
+            width={220}
+            height={160}
+          />
+        ) : (
+          <div className="bg-zinc-200 p-5 mx-auto w-full h-40 flex items-center justify-center">
+            <span className="text-zinc-500 text-sm">No image</span>
+          </div>
+        )}
 
-            {role === "admin" && (
-              <div>
-                <button
-                  onClick={() => handleDelete(p._id)}
-                  className="mt-2 bg-red-500 hover:bg-red-600 text-white px-2 py-1 me-4 rounded-lg"
-                >
-                  Delete
-                </button>
-                <button
-                  onClick={() => { router.push(`/admin/products/edit/${p._id}`) }}
-                  className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg"
-                >
-                  Edit
-                </button>
-              </div>
-            )}
+        <p className="font-semibold text-base md:text-lg">{p.name}</p>
+        <p className="text-green-600 font-bold">₹{p.price}</p>
 
-          </div>)}
-        </div>
+        {role === "user" && (
+          <button
+            onClick={() => handleAddToCart(p._id)}
+            className="mt-2 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded w-full"
+          >
+            Book Now
+          </button>
+        )}
+
+        {role === "admin" && (
+          <div className="flex justify-between mt-2">
+            <button
+              onClick={() => handleDelete(p._id)}
+              className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-lg"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => router.push(`/admin/products/edit/${p._id}`)}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg"
+            >
+              Edit
+            </button>
+          </div>
+        )}
+      </div>
+    ))}
+
+</div>
+
+       
         <div className="flex items-center justify-center">
         {role==="admin"&&(
-          <Button className="bg-green-600 text-lg hover:bg-green-700 m-4 " onClick={()=>{router.push("/admin/products/add")}}>Add Product</Button>
+          <Button className="bg-green-600 text-lg hover:bg-green-700 md:m-4 m-2 " onClick={()=>{router.push("/admin/products/add")}}>Add Product</Button>
         )}
       </div>
       </section>

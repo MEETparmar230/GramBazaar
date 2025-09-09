@@ -1,4 +1,3 @@
-
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -9,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -19,52 +17,66 @@ import { Input } from "@/components/ui/input"
 import { CldImage, CldUploadWidget } from "next-cloudinary"
 import { useState } from "react"
 import axios from "axios"
+import { useRouter } from "next/navigation"
 
 const formSchema = z.object({
   name: z.string().min(2, {
-    message: "name must be at least 2 characters.",
+    message: "Name must be at least 2 characters.",
   }),
-  description: z.string(),
-
+  description: z.string().optional(),
   imageId: z.string().min(2, {
-    message: "didn't got imageId from cloudinary.",
+    message: "Image ID is required.",
   }),
-
+  imageUrl: z.string().min(2, {
+    message: "Image URL is required.",
+  }),
 })
 
 type CloudinaryUploadResult = {
   info?: {
     public_id: string
+    secure_url: string
   }
 }
 
 export default function AddServicepage() {
-
   const preset = process.env.NEXT_PUBLIC_PRESET_NAME!
-  const [image_id,setImage_id]= useState<string>("")
+  const [imageUrl, setImageUrl] = useState<string>("")
+  const router = useRouter()
+  const [imageUploading, setImageUploading] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      description: '',
-      imageId: ''
+      name: "",
+      description: "",
+      imageId: "",
+      imageUrl: "",
     },
   })
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-
-    axios.post("/api/services",values)
-    form.reset()
-    setImage_id("")
-    
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      setLoading(true)
+      await axios.post("/api/admin/services", values)
+      form.reset()
+      setImageUrl("")
+    } catch (err) {
+      console.error("Error adding service:", err)
+    } finally {
+      router.push("/services")
+      setLoading(false)
+    }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8 mx-auto min-w-fit max-w-1/3 bg-white p-5 rounded-lg my-5 ring-2 ring-green-200"
+      >
+        {/* Service Name */}
         <FormField
           control={form.control}
           name="name"
@@ -72,63 +84,84 @@ export default function AddServicepage() {
             <FormItem>
               <FormLabel>Service:</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input placeholder="Service name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        {/* Description */}
         <FormField
           control={form.control}
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>description:</FormLabel>
+              <FormLabel>Description:</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input placeholder="Description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        {/* Image Upload */}
         <FormField
           control={form.control}
           name="imageId"
-          render={({ field }) => (
+          render={() => (
             <FormItem>
+              <FormLabel>Upload Image:</FormLabel>
               <FormControl>
-                <CldUploadWidget uploadPreset={preset}
+                <CldUploadWidget
+                  uploadPreset={preset}
+                  onUploadAdded={() => setImageUploading(true)}
                   onSuccess={(results) => {
-                    const typedResults=results as CloudinaryUploadResult
-                    if(typedResults.info?.public_id){
-                    form.setValue("imageId", typedResults.info?.public_id)
-                    setImage_id(typedResults.info?.public_id)
+                    const typedResults = results as CloudinaryUploadResult
+                    if (typedResults.info?.public_id && typedResults.info?.secure_url) {
+                      form.setValue("imageId", typedResults.info.public_id)
+                      form.setValue("imageUrl", typedResults.info.secure_url)
+                      setImageUrl(typedResults.info.secure_url)
                     }
+                    setImageUploading(false)
                   }}
+                  onError={() => setImageUploading(false)}
                 >
-
-                  {({ open }) => {
-                    return (
-                      <button className="button" onClick={() => open()}>
-                        Upload
-                      </button>
-                    );
-                  }}
-
+                  {({ open }) => (
+                    <button
+                      type="button"
+                      className="bg-lime-600 text-zinc-100 px-2 py-1 rounded-md hover:bg-lime-800 w-full"
+                      onClick={() => open()}
+                    >
+                      {imageUploading ? "Uploading..." : "Upload"}
+                    </button>
+                  )}
                 </CldUploadWidget>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        {image_id && <CldImage
-          width="960"
-          height="600"
-          src={image_id}
-          sizes="100vw"
-          alt="Description of my image"
-        />}
-        <Button type="submit">Submit</Button>
+
+        {/* Image Preview */}
+        {imageUrl && !imageUploading && (
+          <CldImage
+            width="150"
+            height="150"
+            src={imageUrl}
+            sizes="100vw"
+            alt="Service image preview"
+            className="rounded ring-2 ring-green-200"
+          />
+        )}
+
+        {/* Submit */}
+        <div className="ms-auto w-fit">
+          <Button type="submit" variant={"my"} size={"lg"} className="text-md">
+            {loading ? "Submitting..." : "Submit"}
+          </Button>
+        </div>
       </form>
     </Form>
   )

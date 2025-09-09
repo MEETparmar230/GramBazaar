@@ -25,7 +25,7 @@ interface serviceType {
 export default function HomePage() {
 
   return (
-    <main className=" items-center mx-auto  mx-4 flex flex-col gap-10 my-4">
+    <main className=" items-center flex flex-col gap-10 my-4 mx-2 md:w-3/4 md:mx-auto">
 
       <ServiceCard />
 

@@ -2,7 +2,6 @@
 import { ContactFormData,contactSchema } from "@/lib/validations/message";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -48,12 +47,12 @@ export default function ContactForm() {
     }
   }
 
- 
+  
   return (
-    <div className=" mx-auto  bg-zinc-100 rounded-lg w-3xl shadow py-6 px-10 ring-3 ring-green-200">
-      <h2 className="text-3xl text-center mb-6 font-bold mb-4 text-zinc-900">Contact Us</h2>
-      <p className="mb-2 text-lg text-zinc-900 ">📍 <span className="text-green-600">GramBazaar HQ</span>, Village Center, India</p>
-      <p className="mb-4 text-lg text-zinc-900 mb-8">📞 Helpline: 1800-123-456</p>
+    <div className=" md:mx-auto mx-2  bg-zinc-100 rounded-lg md:max-w-3xl w-full shadow py-6 px-10 ring-3 ring-green-200">
+      <h2 className="md:text-3xl text-2xl text-center mb-6 font-bold mb-4 text-zinc-900">Contact Us</h2>
+      <p className="mb-2 md:text-lg text-zinc-900 ">📍 <span className="text-green-600">GramBazaar HQ</span>, Village Center, India</p>
+      <p className="mb-4 md:text-lg text-zinc-900 mb-8">📞 Helpline: 1800-123-456</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <div>
@@ -85,7 +84,7 @@ export default function ContactForm() {
         </div>
         <button
           type="submit"
-          className="bg-green-600 text-white text-lg w-xl mx-auto my-2 px-4 py-2 rounded hover:bg-green-700"
+          className="bg-green-600 text-white md:text-lg md:w-xl w-2/3 mx-auto my-2 px-4 py-2 rounded hover:bg-green-700"
         >
           {isSubmitting ? "sending...":"Send"}
         </button>

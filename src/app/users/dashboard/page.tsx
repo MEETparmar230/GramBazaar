@@ -69,10 +69,14 @@ export default function Dashboard() {
         }
     };
 
-    if (loading) return <p className="text-center mt-10">Loading dashboard...</p>;
+    if (loading) return (
+        <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    )
 
     return (
-        <div className="w-3/4 md:mx-auto lg:mx-auto mx-2  p-6 mt-10 mb-4 bg-white shadow rounded-lg ring-2 ring-green-200">
+        <div className="md:w-3/4 md:mx-auto lg:mx-auto mx-2  p-6 mt-10 mb-4 bg-white shadow rounded-lg ring-2 ring-green-200">
             <h1 className="text-2xl font-bold mb-4">Welcome, {user.name} 👋</h1>
             <p className="mb-6 text-gray-600">Email: {user.email}</p>
 
@@ -81,7 +85,7 @@ export default function Dashboard() {
             {bookings.length === 0 ? (
                 <p className="text-gray-500 mb-4">No bookings yet.</p>
             ) : (
-                <div className="space-y-4 mb-4 grid grid-cols-3 gap-5">
+                <div className="space-y-4 grid gap-6 grid-cols-[repeat(auto-fit,minmax(220px,1fr))]">
                     {bookings.map((booking, idx) => {
                         const merged = mergeItems(booking.items);
                         return (
@@ -117,8 +121,9 @@ export default function Dashboard() {
                     })}
                 </div>
             )}
-            <div className='ring-2 ring-green-200 px-2 w-2/4 mx-auto rounded my-5 '>
-            <h2 className="text-xl font-semibold mb-3 text-zinc-800 mt-10 p-4">✏️ Edit Profile</h2>
+            
+            <h2 className="text-xl font-semibold mb-3 text-zinc-800 mt-10">✏️ Edit Profile</h2>
+            <div className='ring-2 ring-green-200  md:w-2/4 mx-auto rounded p-5 '>
             <div className="space-y-4 flex flex-col items-center">
                 <input
                     type="text"
@@ -136,7 +141,7 @@ export default function Dashboard() {
                 />
                 <button
                     onClick={handleUpdate}
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mb-2"
+                    className="bg-green-600 text-white px-4 py-2 w-2/3 rounded hover:bg-green-700 whitespace-nowrap"
                 >
                     Update Profile
                 </button>

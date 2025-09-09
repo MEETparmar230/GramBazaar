@@ -59,7 +59,9 @@ export async function PUT(req:NextRequest,context:Contex){
             console.log("no data arrived from client to update")
             return NextResponse.json({message:"no data arrived from client to update"},{status:400})
         }
-
+        if (body.date && typeof body.date === "string") {
+  body.date = new Date(body.date)
+}
         const validation = newsSchema.safeParse(body)
 
         if(!validation.success){

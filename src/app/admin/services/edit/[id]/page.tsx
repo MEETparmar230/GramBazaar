@@ -1,4 +1,3 @@
-
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -9,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -23,14 +21,12 @@ import { useParams, useRouter } from "next/navigation"
 
 const formSchema = z.object({
   name: z.string().min(2, {
-    message: "name must be at least 2 characters.",
+    message: "Name must be at least 2 characters.",
   }),
-  description: z.string(),
-
+  description: z.string().optional(),
   imageId: z.string().min(2, {
-    message: "didn't got imageId from cloudinary.",
+    message: "Didn't get imageId from Cloudinary.",
   }),
-
 })
 
 type CloudinaryUploadResult = {
@@ -39,121 +35,175 @@ type CloudinaryUploadResult = {
   }
 }
 
-export default function AddServicepage() {
-
+export default function EditServicePage() {
   const params = useParams()
-  const id = params.id
+  const id = params.id as string
   const router = useRouter()
 
   const preset = process.env.NEXT_PUBLIC_PRESET_NAME!
-  const [image_id,setImage_id]= useState<string>("")
+  const [imageId, setImageId] = useState<string>("")
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
 
-  // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      description: '',
-      imageId: ''
+      name: "",
+      description: "",
+      imageId: "",
     },
   })
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  // Fetch service on mount
+  useEffect(() => {
+    if (!id) return
+    setLoading(true)
 
-    axios.put(`/api/services/${id}`,values)
-    router.push("/services")
-    form.reset()
-    setImage_id("")
-    
-  }
-
-useEffect(()=>{
-      if (!id) return
-
-      axios.get(`/api/news/${id}`)
-      .then((res)=>{
+    axios
+      .get(`/api/admin/services/${id}`)
+      .then((res) => {
         const service = res.data?.service
         form.reset({
-      name:service.name,
-      description: service.description,
-      imageId: service.imageId
+          name: service.name,
+          description: service.description,
+          imageId: service.imageId,
         })
-        setImage_id(service.imageId)
+        setImageId(service.imageId)
       })
       .catch((err) => {
         console.error(err.response?.data || err.message)
       })
+      .finally(() => setLoading(false))
+  }, [id, form])
 
-    },[id])
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setSubmitting(true)
+    try {
+      await axios.put(`/api/admin/services/${id}`, values)
+      router.push("/services")
+    } catch (error) {
+      console.error("Update failed:", error)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (loading) {
+    return (
+    <div className="space-y-6 mx-auto min-w-fit max-w-1/3 bg-white p-5 rounded-lg my-5 ring-2 ring-green-200 animate-pulse">
+      {/* Name */}
+      <div className="space-y-2">
+        <div className="h-4 w-20 bg-gray-300 rounded"></div>
+        <div className="h-10 w-full bg-gray-200 rounded"></div>
+      </div>
+
+      {/* Description */}
+      <div className="space-y-2">
+        <div className="h-4 w-28 bg-gray-300 rounded"></div>
+        <div className="h-10 w-full bg-gray-200 rounded"></div>
+      </div>
+
+      {/* Upload */}
+      <div className="space-y-2">
+        <div className="h-4 w-24 bg-gray-300 rounded"></div>
+        <div className="h-8 w-24 bg-gray-200 rounded"></div>
+      </div>
+
+      {/* Image preview */}
+      <div className="h-32 w-32 bg-gray-200 rounded-lg"></div>
+
+      {/* Submit */}
+      <div className="h-10 w-32 bg-gray-300 rounded"></div>
+    </div>
+  )
+  }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mx-auto min-w-fit max-w-1/3 bg-white p-5 rounded-lg my-5 ring-2 ring-green-200">
+        {/* Name */}
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Service:</FormLabel>
+              <FormLabel>Service</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input placeholder="Service name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        {/* Description */}
         <FormField
           control={form.control}
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>description:</FormLabel>
+              <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input placeholder="Service description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        {/* Image Upload */}
         <FormField
           control={form.control}
           name="imageId"
-          render={({ field }) => (
+          render={() => (
             <FormItem>
+              <FormLabel>Upload Image</FormLabel>
               <FormControl>
-                <CldUploadWidget uploadPreset={preset}
+                <CldUploadWidget
+                  uploadPreset={preset}
                   onSuccess={(results) => {
-                    const typedResults=results as CloudinaryUploadResult
-                    if(typedResults.info?.public_id){
-                    form.setValue("imageId", typedResults.info?.public_id)
-                    setImage_id(typedResults.info?.public_id)
+                    const typedResults = results as CloudinaryUploadResult
+                    if (typedResults.info?.public_id) {
+                      form.setValue("imageId", typedResults.info.public_id)
+                      setImageId(typedResults.info.public_id)
                     }
                   }}
                 >
-
-                  {({ open }) => {
-                    return (
-                      <button className="button" onClick={() => open()}>
-                        Upload
-                      </button>
-                    );
-                  }}
-
+                  {({ open }) => (
+                    <button
+                      type="button"
+                      className="bg-lime-600 text-white px-3 py-1 rounded hover:bg-lime-800"
+                      onClick={() => open()}
+                    >
+                      Upload
+                    </button>
+                  )}
                 </CldUploadWidget>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        {image_id && <CldImage
-          width="960"
-          height="600"
-          src={image_id}
-          sizes="100vw"
-          alt="Description of my image"
-        />}
-        <Button type="submit">Submit</Button>
+
+        {/* Preview */}
+        {imageId && (
+         
+          <CldImage
+            width="150"
+            height="150"
+            src={imageId}
+            alt="Service preview"
+            className="rounded ring-2 ring-green-200 p-2"
+          />
+          
+        )}
+
+        {/* Submit */}
+        <div className="w-fit ms-auto">
+        <Button type="submit" disabled={submitting} variant={"my"} className="">
+          {submitting ? "Updating..." : "Update Service"}
+        </Button>
+        </div>
       </form>
     </Form>
   )
