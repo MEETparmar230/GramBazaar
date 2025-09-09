@@ -82,8 +82,8 @@ export default function Product() {
   return (
     <div className='w-full'>
       <section id="products" className="bg-zinc-100 p-4 w-full rounded-lg  shadow  ring-2 ring-green-200 mx-auto w-full">
-        <h2 className="md:text-3xl text-2xl text-zinc-700 font-bold m-2 ">Available Products</h2>
-        <div className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(220px,1fr))]">
+        <h2 className="md:text-3xl text-2xl text-zinc-700 font-bold mb-4 ">Available Products</h2>
+        <div className="md:my-5 grid gap-6 grid-cols-[repeat(auto-fit,minmax(220px,1fr))]">
   {loading
   ? Array.from({ length: 6 }).map((_, i) => <ProductSkeletonCard key={i} />)
   : products.map((p) => (

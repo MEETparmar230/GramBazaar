@@ -56,7 +56,7 @@ function ServiceSkeletonCard() {
         id="services"
         className="bg-zinc-100  rounded-lg shadow-md  p-5 ring-2 ring-green-200"
       >
-        <h2 className="md:text-3xl text-2xl text-zinc-700 font-bold md:m-2 ">Our Services</h2>
+        <h2 className="md:text-3xl text-2xl text-zinc-700 font-bold md:m-2 mb-2">Our Services</h2>
         <div className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(220px,1fr))]">
           {loading
   ? Array.from({ length: 4 }).map((_, i) => <ServiceSkeletonCard key={i} />)

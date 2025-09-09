@@ -5,11 +5,16 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { RiMenu2Fill } from "react-icons/ri";
+import { usePathname, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function Navbar() {
 
   const [menuOpen, setMenuOpen] = useState(false); 
   const [role,setRole] = useState<"user"|"admin"|null>(null)
+  const router = useRouter();
+  const [loading,setLoading] = useState<boolean>(true)
+  const pathname = usePathname();
 
 useEffect(() => {
   axios.get("/api/profile")
@@ -18,43 +23,44 @@ useEffect(() => {
     })
     .catch(() => {
       setRole(null);
-    });
+    })
+    .finally(()=>{setLoading(false)})
 }, []);
 
 
   const handleLogout = async () => {
     try {
       await axios.post("/api/logout");
-      alert("Logged out!");
+      toast.success("Logged out!");
       setRole(null);
-      window.location.href = "/";
+      router.push("/");
     } catch (error) {
-      alert("Logout failed.");
+      toast.error("Logout failed.");
     }
   };
 
   const NavLinks = () => (
   <>
-    <li><Link href="/">Home</Link></li>
+    <li><Link href="/" onClick={() => setMenuOpen(false)} className={pathname === '/'?"underline font-semibold text-zinc-100":""}>Home</Link></li>
 
     {(role==="user") && (
-      <li><Link href="/users/dashboard">Dashboard</Link></li>
+      <li><Link href="/users/dashboard" onClick={() => setMenuOpen(false)} className={pathname === '/users/dashboard'?"underline font-semibold text-zinc-100":""}>Dashboard</Link></li>
     )}
      {(role==="admin") && (
-      <li><Link href="/admin/dashboard">Dashboard</Link></li>
+      <li><Link href="/admin/dashboard" onClick={() => setMenuOpen(false)} className={pathname === '/admin/dashboard'?"underline font-semibold text-zinc-100":""}>Dashboard</Link></li>
     )}
 
-    <li><Link href="/services">Services</Link></li>
-    <li><Link href="/products">Products</Link></li>
-    <li><Link href="/news">News</Link></li>
+    <li><Link href="/services" onClick={() => setMenuOpen(false)} className={pathname === '/services'?"underline font-semibold text-zinc-100":""}>Services</Link></li>
+    <li><Link href="/products" onClick={() => setMenuOpen(false)} className={pathname === '/products'?"underline font-semibold text-zinc-100":""}>Products</Link></li>
+    <li><Link href="/news" onClick={() => setMenuOpen(false)} className={pathname === '/news'?"underline font-semibold text-zinc-100":""}>News</Link></li>
     {role==="user"  &&
       (
-      <li><Link href="/users/cart">Cart</Link></li>
+      <li><Link href="/users/cart" onClick={() => setMenuOpen(false)} className={pathname === '/users/cart'?"underline font-semibold text-zinc-100":""}>Cart</Link></li>
 
       )}
 
     {(role==="user" || role===null) &&
-    (<li><Link href="/contact">Contact</Link></li>)}
+    (<li><Link href="/contact" onClick={() => setMenuOpen(false)} className={pathname === '/contact'?"underline font-semibold text-zinc-100":""}>Contact</Link></li>)}
 
     {(role==="user" || role==="admin") ? (
       <li>
@@ -62,8 +68,8 @@ useEffect(() => {
       </li>
     ) : (
       <>
-        <li><Link href="/login">Login</Link></li>
-        <li><Link href="/register">Sign Up</Link></li>
+        <li><Link href="/login" onClick={() => setMenuOpen(false)} className={pathname === '/login'?"underline font-semibold text-zinc-100":""}>Login</Link></li>
+        <li><Link href="/register" onClick={() => setMenuOpen(false)} className={pathname === '/register'?"underline font-semibold text-zinc-100":""}>Sign Up</Link></li>
       </>
     )}
   </>
@@ -76,7 +82,8 @@ useEffect(() => {
 
       {/* Desktop Nav */}
       <ul className="hidden md:flex gap-5 items-center">
-       <NavLinks/>
+       {!loading && <NavLinks />}
+
       </ul>
 
       {/* Mobile Menu Icon */}
@@ -90,8 +97,8 @@ useEffect(() => {
 
       {/* Mobile Dropdown */}
       {menuOpen && (
-        <ul className="absolute top-16 right-4 bg-white text-black rounded shadow-md p-4 flex flex-col gap-3 z-50 w-48 md:hidden">
-          <NavLinks/>
+        <ul className="absolute top-12 right-0 bg-green-700 text-white  rounded-b shadow-xl shadow-green-300 p-4 flex flex-col gap-3 z-50 w-48 md:hidden">
+          {!loading && <NavLinks />}
         </ul>
       )}
     </nav>

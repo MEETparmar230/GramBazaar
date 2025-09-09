@@ -87,7 +87,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="container mx-auto md:px-4 py-8 ">
-      <h1 className="md:text-3xl text-2xl font-bold text-zinc-800 mb-8 whitespace-nowrap">Dashboard Overview</h1>
+      <h1 className="md:text-3xl text-2xl font-bold text-zinc-800 md:mb-8 mb-4 whitespace-nowrap">Dashboard Overview</h1>
       
       {/* Stats Grid */}
       <div className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(220px,1fr))] mb-8 ">
