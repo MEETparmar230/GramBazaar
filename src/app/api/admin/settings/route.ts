@@ -11,7 +11,9 @@ export async function GET() {
             return NextResponse.json({ message: "No settings found" }, { status: 404 })
         }
 
-        return NextResponse.json(settings, { status: 200 })
+
+return NextResponse.json({ name: settings.name, logo: settings.logo }, { status: 200 })
+
     }
     catch (err) {
         console.error("Internal server Error", err)

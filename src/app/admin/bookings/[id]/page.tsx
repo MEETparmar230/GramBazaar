@@ -4,6 +4,22 @@ import { useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
 import { useParams } from "next/navigation";
 import { toast } from "react-hot-toast";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 interface BookingItem {
   _id: string;
@@ -37,13 +53,16 @@ interface BookingType {
 export default function BookingDetailsPage() {
   const params = useParams();
   const bookingId =
-    typeof params?.id === "string" ? params.id : Array.isArray(params?.id) ? params.id[0] : "";
+    typeof params?.id === "string"
+      ? params.id
+      : Array.isArray(params?.id)
+      ? params.id[0]
+      : "";
 
   const [booking, setBooking] = useState<BookingType | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
 
-  // local state for status update
   const [status, setStatus] = useState<string>("Pending");
   const [cancellationReason, setCancellationReason] = useState<string>("");
 
@@ -55,7 +74,8 @@ export default function BookingDetailsPage() {
         setBooking(res.data);
 
         if (res.data.status) setStatus(res.data.status);
-        if (res.data.cancellationReason) setCancellationReason(res.data.cancellationReason);
+        if (res.data.cancellationReason)
+          setCancellationReason(res.data.cancellationReason);
       } catch (err) {
         console.error("Error fetching booking:", err);
         toast.error("Failed to fetch booking details");
@@ -85,111 +105,165 @@ export default function BookingDetailsPage() {
     } catch (err) {
       const axiosError = err as AxiosError<{ error: string }>;
       console.error("Error updating status:", axiosError);
-      toast.error(axiosError.response?.data?.error || "Failed to update status");
+      toast.error(
+        axiosError.response?.data?.error || "Failed to update status"
+      );
     } finally {
       setUpdating(false);
     }
   };
 
-  if (loading) return <p className="p-4">Loading booking...</p>;
+  const statusVariant = (status?: string) => {
+    switch (status) {
+      case "Pending":
+        return "secondary";
+      case "Approved":
+        return "default";
+      case "Rejected":
+      case "Cancelled":
+        return "destructive";
+      case "Completed":
+        return "outline";
+      default:
+        return "secondary";
+    }
+  };
+
+    if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
   if (!booking) return <p className="p-4">Booking not found.</p>;
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Booking Details</h1>
-
-      {/* Customer */}
-      <div className="mb-4 border-b pb-2">
-        <h2 className="text-lg font-semibold">Customer</h2>
-        <p>{booking.user?.name || "User Deleted"}</p>
-        <p>{booking.user?.email || "N/A"}</p>
+    <div className="py-6 px-2 max-w-3xl mx-auto space-y-6 ">
+      <h1 className="md:text-3xl text-2xl font-bold text-zinc-800">Booking Details</h1>
+ 
+    <div className="bg-white rounded-lg p-2 ring-2 ring-green-200">
+      {/* Customer Info */}
+      {/* Customer Info */}
+<Card className="border-0 rounded-none">
+  <CardContent>
+    <div className="flex items-center justify-between">
+      <span className="font-bold w-32  text-zinc-700">Customer</span>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
+        <p className="font-medium">{booking.user?.name || "User Deleted"}</p>
+        <p className="text-muted-foreground">{booking.user?.email || "N/A"}</p>
       </div>
+    </div>
+  </CardContent>
+</Card>
+
 
       {/* Items */}
-      <div className="mb-4 border-b pb-2">
-        <h2 className="text-lg font-semibold">Items</h2>
-        <ul className="list-disc ml-6">
-          {booking.items.map((item) => (
-            <li key={item._id}>
-              {item.quantity} × {item.name} (₹{item.price})
-            </li>
-          ))}
-        </ul>
-      </div>
+      <Card className="border-0 rounded-none">
+        <CardHeader>
+          <CardTitle>Items</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul className="list-disc ml-6 space-y-1">
+            {booking.items.map((item) => (
+              <li key={item._id}>
+                {item.quantity} × {item.name} (₹{item.price})
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
 
-      {/* Payment & total */}
-      <div className="mb-4 border-b pb-2">
-        <h2 className="text-lg font-semibold">Payment</h2>
-        <p>Status: {booking.paymentStatus || "N/A"}</p>
-        <p>Total: ₹{booking.totalAmount || 0}</p>
-      </div>
+      {/* Payment */}
+<Card className="border-none rounded-none">
+  <CardContent className="space-y-2">
+    <div className="flex justify-start gap-5">
+      <span className="font-semibold text-zinc-700 ">Payment Status :</span>
+      <Badge variant="outline">{booking.paymentStatus || "N/A"}</Badge>
+    </div>
+    <div className="flex justify-start gap-5">
+      <span className="font-semibold text-zinc-700">Total Amount :</span>
+      <span className="font-semibold">₹{booking.totalAmount || 0}</span>
+    </div>
+  </CardContent>
+</Card>
 
-      {/* Shipping address */}
+
+
+      {/* Shipping */}
       {booking.shippingAddress && (
-        <div className="mb-4 border-b pb-2">
-          <h2 className="text-lg font-semibold">Shipping Address</h2>
-          <p>{booking.shippingAddress.address}</p>
-          <p>
-            {booking.shippingAddress.city}, {booking.shippingAddress.state} -{" "}
-            {booking.shippingAddress.pincode}
-          </p>
-        </div>
+        <Card className="border-none rounded-none">
+          <CardHeader>
+            <CardTitle>Shipping Address</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>{booking.shippingAddress.address}</p>
+            <p>
+              {booking.shippingAddress.city}, {booking.shippingAddress.state} -{" "}
+              {booking.shippingAddress.pincode}
+            </p>
+          </CardContent>
+        </Card>
       )}
 
-      {/* Current status */}
-      <div className="mb-4 border-b pb-2">
-        <h2 className="text-lg font-semibold">Current Status</h2>
-        <p>{booking.status || "Pending"}</p>
-      </div>
+      {/* Status */}
+<Card className="border-none rounded-none">
+  <CardContent>
+    <div className="flex items-center justify-between mb-4">
+      <span className="font-bold w-32 text-lg text-zinc-700">Current Status</span>
+      <Badge variant={statusVariant(booking.status)}>
+        {booking.status || "Pending"}
+      </Badge>
+    </div>
 
-      {/* Status update section */}
-      <div className="mt-6">
-        <h2 className="text-lg font-semibold mb-3">Update Status</h2>
-        <div className="flex space-x-2 mb-4">
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="border rounded p-2"
-          >
-            <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
-            <option value="Completed">Completed</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
-          <button
-            onClick={handleStatusUpdate}
-            disabled={updating || status === booking.status}
-            className={`px-4 py-2 rounded text-white ${
-              updating || status === booking.status
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-500 hover:bg-blue-600"
-            }`}
-          >
-            {updating ? "Updating..." : "Update"}
-          </button>
-        </div>
+    {/* Update Section */}
+    <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 mb-4">
+      <Select
+        value={status}
+        onValueChange={(val) => setStatus(val)}
+      >
+        <SelectTrigger className="w-48 mt-2">
+          <SelectValue placeholder="Select status " />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="Pending">Pending</SelectItem>
+          <SelectItem value="Approved">Approved</SelectItem>
+          <SelectItem value="Rejected">Rejected</SelectItem>
+          <SelectItem value="Completed">Completed</SelectItem>
+          <SelectItem value="Cancelled">Cancelled</SelectItem>
+        </SelectContent>
+      </Select>
 
-        {status === "Cancelled" && (
-          <div>
-            <label className="block font-medium mb-1">Cancellation Reason</label>
-            <textarea
-              value={cancellationReason}
-              onChange={(e) => setCancellationReason(e.target.value)}
-              className="w-full border rounded p-2"
-              placeholder="Enter reason for cancellation"
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Saved cancellation reason */}
-      {booking.status === "Cancelled" && booking.cancellationReason && (
-        <div className="mt-4 bg-gray-100 p-3 rounded">
-          <h3 className="font-semibold">Cancellation Reason:</h3>
-          <p>{booking.cancellationReason}</p>
-        </div>
+      {status === "Cancelled" && (
+        <Textarea
+          value={cancellationReason}
+          onChange={(e) => setCancellationReason(e.target.value)}
+          placeholder="Enter reason for cancellation"
+          className="sm:w-96 my-2 md:my-0"
+        />
       )}
+
+      <Button
+        onClick={handleStatusUpdate}
+        disabled={updating || status === booking.status}
+        variant={"my"}
+        className="mt-2"
+      >
+        {updating ? "Updating..." : "Update Status"}
+      </Button>
+    </div>
+
+    {/* Saved cancellation reason */}
+    {booking.status === "Cancelled" && booking.cancellationReason && (
+      <div className="bg-muted p-3 rounded">
+        <h3 className="font-semibold mb-1">Cancellation Reason:</h3>
+        <p className="text-sm">{booking.cancellationReason}</p>
+      </div>
+    )}
+  </CardContent>
+</Card>
+
+      </div>
     </div>
   );
 }

@@ -8,15 +8,28 @@ import { RiMenu2Fill } from "react-icons/ri";
 import { usePathname, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
+type TypeOfSettings = {
+  name:string,
+  logo:string
+}
+
 export default function Navbar() {
 
   const [menuOpen, setMenuOpen] = useState(false); 
   const [role,setRole] = useState<"user"|"admin"|null>(null)
+  const [settings,setSettings] = useState<TypeOfSettings>()
   const router = useRouter();
   const [loading,setLoading] = useState<boolean>(true)
   const pathname = usePathname();
 
 useEffect(() => {
+
+  axios.get("/api/admin/settings")
+  .then((res)=>{
+      setSettings(res.data)
+  })
+  .catch(err=>console.log("Error while fetching settings",err))
+
   axios.get("/api/profile")
     .then((res) => {
       setRole(res.data.user.role ?? null);
@@ -33,6 +46,7 @@ useEffect(() => {
       await axios.post("/api/logout");
       toast.success("Logged out!");
       setRole(null);
+      setMenuOpen(false);
       router.push("/");
     } catch (error) {
       toast.error("Logout failed.");
@@ -76,9 +90,19 @@ useEffect(() => {
 );
 
 
+
   return (
-    <nav className="bg-green-700 text-white px-4 py-3 flex justify-between items-center relative">
-      <h1 className="text-xl font-bold">GramBazaar</h1>
+    <nav className="bg-green-700 h-13 text-white px-4 py-3 flex justify-between items-center relative">
+      <h1 className="text-xl font-bold cursor-pointer"><Link href="/"> {loading ? (
+      <div className="h-7 w-48 bg-zinc-300 rounded animate-pulse"></div>
+    ) : (
+      <>
+        {settings?.logo && (
+          <img src={settings.logo} alt="Logo" className="h-8 inline-block" />
+        )}
+        {settings?.name}
+      </>
+    )}</Link></h1>
 
       {/* Desktop Nav */}
       <ul className="hidden md:flex gap-5 items-center">

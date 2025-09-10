@@ -3,6 +3,17 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
 import { toast } from "react-hot-toast"
+import { Button } from "@/components/ui/button"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Card, CardContent } from "@/components/ui/card"
+import { Trash } from "lucide-react"
 
 interface MessageType {
   _id: string
@@ -17,7 +28,7 @@ export default function ContactMessagesPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(false)
-  // ✅ Extracted fetch function
+
   async function fetchMessages() {
     setFetching(true)
     try {
@@ -27,33 +38,27 @@ export default function ContactMessagesPage() {
       } else {
         toast.error(res.data.message || "Failed to fetch messages")
       }
-    } catch (err) {
-      console.error(err)
+    } catch {
       toast.error("Failed to fetch messages")
     }
     setFetching(false)
   }
 
   useEffect(() => {
-    
     fetchMessages()
-    
   }, [])
 
-  // ✅ Delete one message
   async function deleteMessage(id: string) {
     if (!confirm("Delete this message?")) return
     try {
       await axios.delete(`/api/admin/contact/${id}`)
       toast.success("Message deleted")
       fetchMessages()
-    } catch (err) {
-      console.error(err)
+    } catch {
       toast.error("Failed to delete message")
     }
   }
 
-  // ✅ Bulk delete
   async function deleteSelected() {
     if (selectedIds.length === 0) {
       toast.error("No messages selected")
@@ -71,15 +76,13 @@ export default function ContactMessagesPage() {
       } else {
         toast.error(res.data.message || "Failed to delete messages")
       }
-    } catch (err) {
-      console.error(err)
+    } catch {
       toast.error("Failed to delete selected messages")
     } finally {
       setLoading(false)
     }
   }
 
-  // ✅ Checkbox toggles
   function toggleSelect(id: string) {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
@@ -94,92 +97,111 @@ export default function ContactMessagesPage() {
     }
   }
 
-
-   if (fetching) {
+  if (fetching) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
-    );
+    )
   }
 
   return (
-    <div className="md:p-6 py-4 mx-6 overflow-x-auto">
-      <h1 className="text-2xl font-bold mb-4">Contact Messages</h1>
+    <div className="py-6 px-2 md:px-6">
+      <h1 className="text-2xl font-bold mb-4 text-zinc-800">Contact Messages</h1>
 
-      <div className="mb-4 flex gap-2">
-        <button
-          onClick={toggleSelectAll}
-          className="px-3 py-1 rounded bg-gray-200"
-        >
-          {selectedIds.length === messages.length && messages.length > 0
-            ? "Unselect All"
-            : "Select All"}
-        </button>
-        <button
-          onClick={deleteSelected}
-          disabled={loading || selectedIds.length === 0}
-          className="px-3 py-1 rounded bg-red-500 text-white disabled:opacity-50"
-        >
-          {loading ? "Deleting..." : `Delete Selected (${selectedIds.length})`}
-        </button>
-      </div>
+      <Card className="ring-2 ring-green-200">
+        <CardContent className="p-4">
+          {/* Bulk actions */}
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={toggleSelectAll}>
+                {selectedIds.length === messages.length && messages.length > 0
+                  ? "Unselect All"
+                  : "Select All"}
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={deleteSelected}
+                disabled={loading || selectedIds.length === 0}
+              >
+                {loading
+                  ? "Deleting..."
+                  : `Delete Selected (${selectedIds.length})`}
+              </Button>
+            </div>
+            <span className="text-sm text-gray-500 whitespace-nowrap">
+              {messages.length} {messages.length === 1 ? "message" : "messages"}
+            </span>
+          </div>
 
-      <table className="w-full border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2 border">
-              <input
-                type="checkbox"
-                checked={
-                  selectedIds.length === messages.length && messages.length > 0
-                }
-                onChange={toggleSelectAll}
-              />
-            </th>
-            <th className="p-2 border">Name</th>
-            <th className="p-2 border">Email</th>
-            <th className="p-2 border">Message</th>
-            <th className="p-2 border">Date</th>
-            <th className="p-2 border">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {messages.length === 0 ? (
-            <tr>
-              <td colSpan={6} className="p-4 text-center text-gray-500">
-                No messages found
-              </td>
-            </tr>
-          ) : (
-            messages.map((msg) => (
-              <tr key={msg._id} className="border-b">
-                <td className="p-2 border text-center">
+          {/* Table */}
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-center">
                   <input
                     type="checkbox"
-                    checked={selectedIds.includes(msg._id)}
-                    onChange={() => toggleSelect(msg._id)}
+                    checked={
+                      selectedIds.length === messages.length &&
+                      messages.length > 0
+                    }
+                    onChange={toggleSelectAll}
                   />
-                </td>
-                <td className="p-2 border">{msg.name}</td>
-                <td className="p-2 border">{msg.email}</td>
-                <td className="p-2 border">{msg.message}</td>
-                <td className="p-2 border">
-                  {new Date(msg.createdAt).toLocaleString()}
-                </td>
-                <td className="p-2 border">
-                  <button
-                    onClick={() => deleteMessage(msg._id)}
-                    className="px-2 py-1 bg-red-500 text-white rounded"
+                </TableHead>
+                <TableHead className="text-center">Name</TableHead>
+                <TableHead className="text-center">Email</TableHead>
+                <TableHead className="text-center">Message</TableHead>
+                <TableHead className="text-center">Date</TableHead>
+                <TableHead className="text-center">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {messages.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={6}
+                    className="p-6 text-center text-gray-500"
                   >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+                    🚫 No messages found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                messages.map((msg) => (
+                  <TableRow key={msg._id} className="text-center">
+                    <TableCell>
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(msg._id)}
+                        onChange={() => toggleSelect(msg._id)}
+                      />
+                    </TableCell>
+                    <TableCell>{msg.name}</TableCell>
+                    <TableCell>{msg.email}</TableCell>
+                    <TableCell className="max-w-xs truncate">
+                      {msg.message}
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-gray-600">
+                        {new Date(msg.createdAt).toLocaleString()}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => deleteMessage(msg._id)}
+                      >
+                        <Trash className="h-4 w-4 mr-1" /> Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   )
 }
