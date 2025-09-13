@@ -1,61 +1,60 @@
 import { NextRequest, NextResponse } from "next/server";
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
 export function middleware(req: NextRequest) {
-    const { pathname } = req.nextUrl;
+  const { pathname } = req.nextUrl;
 
-    // Handle admin page routes
-    if (pathname.startsWith("/admin")) {
-        const token = req.cookies.get("token")?.value;
+  // Protect admin pages
+  if (pathname.startsWith("/admin")) {
+    return handleAuth(req, "admin", "/login");
+  }
 
-        if (!token) {
-            return NextResponse.redirect(new URL("/login", req.url));
-        }
+  // Protect admin APIs
+  if (pathname.startsWith("/api/admin")) {
+    return handleAuth(req, "admin");
+  }
 
-        try {
-            const decoded = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
+  // Protect user APIs (logged-in users only)
+  if (pathname.startsWith("/api/users")) {
+    return handleAuth(req, "user"); // ✅ role "user" or higher
+  }
 
-            if (decoded.role !== "admin") {
-                return NextResponse.redirect(new URL("/", req.url));
-            }
-        } catch (err) {
-            return NextResponse.redirect(new URL("/", req.url));
-        }
+  return NextResponse.next();
+}
+
+function handleAuth(req: NextRequest, requiredRole: "admin" | "user", redirectUrl?: string) {
+  const token = req.cookies.get("token")?.value;
+
+  if (!token) {
+    return redirectUrl
+      ? NextResponse.redirect(new URL(redirectUrl, req.url))
+      : NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
+
+    // Role check for admin
+    if (requiredRole === "admin" && decoded.role !== "admin") {
+      return redirectUrl
+        ? NextResponse.redirect(new URL("/", req.url))
+        : NextResponse.json({ error: "Admin access required" }, { status: 403 });
     }
 
-    // Handle admin API routes
-    if (pathname.startsWith("/api/admin")) {
-        const token = req.cookies.get("token")?.value;
-
-        if (!token) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
-        }
-
-        try {
-            const decoded = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
-
-            if (decoded.role !== "admin") {
-                return NextResponse.json(
-                    { error: "Admin access required" },
-                    { status: 403 }
-                );
-            }
-        } catch (err) {
-            return NextResponse.json(
-                { error: "Invalid token" },
-                { status: 401 }
-            );
-        }
-    }
-
-    return NextResponse.next();
+    // 🔥 Attach user info to request headers
+    const res = NextResponse.next();
+    res.headers.set("x-user-id", decoded.id);
+    res.headers.set("x-user-role", decoded.role);
+    return res;
+  } catch (err) {
+    return redirectUrl
+      ? NextResponse.redirect(new URL("/", req.url))
+      : NextResponse.json({ error: "Invalid token" }, { status: 401 });
+  }
 }
 
 export const config = {
-    matcher: ['/admin/:path*', '/api/admin/:path*']
+  matcher: ["/admin/:path*", "/api/admin/:path*", "/api/users/:path*"], 
 };

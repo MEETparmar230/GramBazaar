@@ -1,138 +1,132 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
+import { CartItemType } from '@/lib/validations/cart';
+import { useRouter } from 'next/navigation';
 
-interface Product {
-  _id: string;
-  name: string;
-  price: number;
-  icon?: string;
-}
+// Skeleton component for loading state
+const CartItemSkeleton = () => (
+  <div className="flex flex-col sm:flex-row justify-between items-center p-4 border rounded-lg shadow-sm animate-pulse">
+    <div className="flex-1 mb-2 sm:mb-0">
+      <div className="h-5 bg-gray-300 rounded w-3/4 mb-2"></div>
+      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+    </div>
+    <div className="flex items-center space-x-2">
+      <div className="w-20 h-8 bg-gray-200 rounded"></div>
+      <div className="h-5 bg-gray-300 rounded w-16"></div>
+    </div>
+  </div>
+);
 
-export default function BookPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [selectedItems, setSelectedItems] = useState<Record<string, number>>({});
+const CartSkeleton = () => (
+  <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg ring-2 ring-green-200 my-6">
+    <div className="h-8 bg-gray-300 rounded w-48 mx-auto mb-6 animate-pulse"></div>
+    <div className="space-y-4">
+      {[...Array(3)].map((_, index) => (
+        <CartItemSkeleton key={index} />
+      ))}
+    </div>
+    <div className="mt-6 flex justify-between items-center border-t pt-4">
+      <div className="h-6 bg-gray-300 rounded w-32 animate-pulse"></div>
+      <div className="h-10 bg-gray-300 rounded w-40 animate-pulse"></div>
+    </div>
+  </div>
+);
+
+export default function CartPage() {
+  const [cartItems, setCartItems] = useState<CartItemType[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchCart = async () => {
       try {
-        const res = await axios.get('/api/product');
-        setProducts(res.data);
+        const res = await axios.get('/api/users/cart');
+        setCartItems(res.data.items || []);
       } catch (err) {
-        console.error('Failed to load products:', err);
-        toast.error('Failed to load products');
+        toast.error('Failed to fetch cart');
       } finally {
         setLoading(false);
       }
     };
-    fetchProducts();
+
+    fetchCart();
   }, []);
 
   const handleQuantityChange = (productId: string, quantity: number) => {
-    setSelectedItems((prev) => ({
-      ...prev,
-      [productId]: quantity,
-    }));
+    setCartItems((prev) =>
+      prev.map((item) =>
+        item.productId === productId ? { ...item, quantity } : item
+      )
+    );
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const totalAmount = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
-    const itemsToBook = products
-      .filter((p) => selectedItems[p._id] > 0)
-      .map((p) => ({
-        productId: p._id,
-        quantity: selectedItems[p._id],
-      }));
-
-    if (itemsToBook.length === 0) {
-      toast.error('Please select at least one product with quantity.');
-      return;
-    }
-
-    try {
-      await axios.post('/api/users/bookings', { items: itemsToBook });
-      toast.success('Booking successful!');
-      router.push('/users/dashboard?success=1');
-    } catch (err) {
-      console.error('Booking failed:', err);
-      toast.error('Booking failed, please try again.');
-    }
+  const handleCheckout = () => { 
+    router.push('/users/payment'); // Removed total parameter as suggested
   };
 
+  if (loading) {
+    return <CartSkeleton />;
+  }
 
+  if (!cartItems.length) {
+    return (
+      <div className="flex flex-col justify-center items-center h-64 space-y-4">
+        <div className="text-6xl">🛒</div>
+        <p className="text-gray-500 text-lg">Your cart is empty</p>
+        <button
+          onClick={() => router.push('/products')}
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+        >
+          Continue Shopping
+        </button>
+      </div>
+    );
+  }
 
-  const totalAmount = products.reduce((total, p) => {
-    const qty = selectedItems[p._id] || 0;
-    return total + p.price * qty;
-  }, 0);
-
-if (loading) {
   return (
-    <div className="md:mx-auto mx-2 px-2 p-6 my-6 bg-white md:w-3/4 shadow rounded ring-2 ring-green-200">
-      <h1 className="text-2xl font-bold mb-4 text-zinc-800">🛒 Book Products</h1>
-      <div className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(220px,1fr))]">
-        {[...Array(6)].map((_, index) => (
+    <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg ring-2 ring-green-200 my-6">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">🛒 Your Cart</h2>
+      <div className="space-y-4">
+        {cartItems.map((item) => (
           <div
-            key={index}
-            className="flex justify-between items-center border p-3 rounded ring-1 ring-green-200 animate-pulse"
+            key={item.productId}
+            className="flex flex-col sm:flex-row justify-between items-center p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow"
           >
-            <div className="flex-1">
-              <div className="h-4 bg-gray-300 rounded w-2/3 mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+            <div className="flex-1 mb-2 sm:mb-0">
+              <p className="font-semibold text-gray-700">{item.name}</p>
+              <p className="text-gray-500 text-sm">₹{item.price}</p>
             </div>
-            <div className="w-20 h-8 bg-gray-300 rounded"></div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="number"
+                min={1}
+                value={item.quantity}
+                onChange={(e) =>
+                  handleQuantityChange(item.productId, parseInt(e.target.value) || 1)
+                }
+                className="w-20 border rounded px-2 py-1 text-center focus:outline-none focus:ring-2 focus:ring-green-400"
+              />
+              <span className="font-semibold text-gray-700">₹{item.price * item.quantity}</span>
+            </div>
           </div>
         ))}
       </div>
-    </div>
-  );
-}
-
-
-
-  return (
-    <div className=" md:mx-auto mx-2  p-6 my-6 bg-white md:w-3/4  shadow rounded ring-2 ring-green-200">
-      <h1 className="text-2xl font-bold mb-4 text-zinc-800">🛒 Book Products</h1>
-      <form onSubmit={handleSubmit} className="space-y-4  ">
-        <div className='grid gap-6 grid-cols-[repeat(auto-fit,minmax(220px,1fr))] '>
-          {products.map((product) => (
-            <div
-              key={product._id}
-              className="flex justify-between items-center border p-3  rounded ring-1 ring-green-200"
-            >
-              <div>
-                <p className="font-semibold">{product.name}</p>
-                <p className="text-gray-500 text-sm">₹{product.price}</p>
-              </div>
-              <input
-                type="number"
-                min={0}
-                value={selectedItems[product._id] || 0}
-                onChange={(e) =>
-                  handleQuantityChange(product._id, parseInt(e.target.value) || 0)
-                }
-                className="w-20 border rounded px-2 py-1"
-              />
-            </div>
-          ))}
-          {totalAmount > 0 && (
-            <p className="font-semibold text-right">Total: ₹{totalAmount}</p>
-          )}
-        </div>
+      <div className="mt-6 flex justify-between items-center border-t pt-4">
+        <p className="text-lg font-bold text-gray-800">Total: ₹{totalAmount}</p>
         <button
-          type="submit"
-          disabled={totalAmount === 0}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={handleCheckout}
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
         >
-          Book Selected Products
+          Proceed to Checkout
         </button>
-      </form>
+      </div>
     </div>
   );
 }
