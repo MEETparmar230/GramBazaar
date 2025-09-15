@@ -112,7 +112,7 @@ export default function BookingDetailsPage() {
   }
 
   return (
-    <div className="max-w-2xl md:mx-auto mx-2 mt-10 bg-white shadow rounded-xl ring-2 ring-green-200  pb-2">
+    <div className="max-w-2xl md:mx-auto mx-2 mt-10 bg-white shadow rounded-xl ring-2 ring-green-200  mb-10">
       <div className="p-6">
         <h1 className="text-xl font-bold mb-4">Booking Details</h1>
         <p className="text-gray-500 mb-2">Booking ID: {booking._id}</p>
@@ -148,14 +148,15 @@ export default function BookingDetailsPage() {
       
       {/* Only show checkout if payment is still pending/failed */}
       {["Pending", "Failed"].includes(booking.paymentStatus) && (
-        <div className="mb-6 rounded-xl overflow-hidden">
+        <div className="rounded-xl overflow-hidden">
           <EmbeddedCheckoutWrapper bookingId={booking._id} />
         </div>
       )}
       
       {/* Show success message if payment completed */}
       {booking.paymentStatus === 'Completed' && (
-        <div className="mb-6 p-6 bg-green-50 border border-green-200 rounded-xl mx-6">
+        <div className="pb-6">
+        <div className="mx-6 p-6 bg-green-50 border border-green-200 rounded-xl ">
           <div className="flex items-center">
             <div className="text-green-500 text-2xl mr-3">✅</div>
             <div>
@@ -163,6 +164,7 @@ export default function BookingDetailsPage() {
               <p className="text-green-600">Your booking has been confirmed and payment processed successfully.</p>
             </div>
           </div>
+        </div>
         </div>
       )}
     </div>
