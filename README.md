@@ -1,40 +1,64 @@
-# Village Kart - Mini Full-Stack Web App
+# 🌾 GramBazaar – Village Kart
 
-A simple platform helping rural communities easily find and access essential products like groceries, medicines, and tools.
-
+GramBazaar (Village Kart) is a Next.js 15 MERN Stack e-commerce platform built as a full-stack project.
+It allows users to explore rural products, book and pay securely via Stripe Sandbox, and provides a separate Admin Dashboard for managing the platform.
 ---
 
 ## 🌐 [Live App](https://gram-bazaar.vercel.app/)
 
 
-## Features
 
-- **User Authentication**: Signup and login with secure backend  
-- **Product Booking**: Select products and quantities, book them  
-- **User Dashboard**: View welcome message, bookings, and edit profile  
-- **Dynamic Products List**: Products fetched from backend API  
-- **Responsive UI**: Works well on mobile and desktop devices  
-- **Homepage Sections**:  
-  - Navbar (Logo, Home, Services, Products, Contact)  
-  - Our Services (5 service types with icons)  
-  - Available Products (6+ products with name, price, icon)  
-  - News & Updates (static headlines)  
-  - Contact Us (address, helpline, contact form)  
+## 🚀 Features
 
+- **👥 Authentication**: 
+  - User Login & Signup with JWT authentication
+  - Secure password hashing using bcryptjs
+- **🛒 User Functionality**: 
+  - Browse and add products to Cart
+  - Stripe Sandbox payment gateway integration
+  - Bookings Dashboard:
+    - View all bookings (paid & unpaid)
+    - Complete pending payments directly
+  - Profile Management (edit name, mobile number)
+- **📰 Additional Pages**: 
+  - Services Page – showcase services offered
+  - News Page – updates and announcements
+- **🛠️ Admin Functionality**: 
+  - Admin Dashboard:
+    - Stats: total users, products, bookings, revenue, news
+    - Recent activities
+    - Pie chart analytics (users, products, bookings)
+    - Site settings (update site name & logo)
+  - Product / News / Services Management:
+    - Add, Edit, Delete
+  - Bookings Management:
+    - View all bookings
+    - Change booking status (Pending/Approved/Rejected)
+    - Export bookings as CSV
+    - Detailed booking page
+  - User Management:
+    - Change roles (User ↔ Admin)
+    - Delete users
+  - Messages Management:
+    - View messages from contact form
+    - Mark as read / delete single or multiple messages
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-- **Frontend:** Next.js (React.js) with Tailwind CSS,Shadcn
+- **Frontend:** Next.js 15, React 19, TailwindCSS, ShadCN UI
 - **Backend:** Next.js API Routes (Node.js, Express-like)  
-- **Validation:** zod
-- **ImageUpload:** Cloudiary
+- **Validation:** zod + React Hook Form
+- **ImageUpload:** Cloudinary
 - **Database:** MongoDB (Mongoose ODM)  
-- **Authentication:** JWT, bcrypt
+- **Authentication:** JWT + bcrypt
+- **Payments:** Stripe (Sandbox mode)
 - **API Requests:** Axios  
 - **Deployment:** Vercel
+- **Other:** Axios, Date-fns, React Hot Toast
 
----
+--- 
+
 
 ## Setup and Run Locally
 
@@ -45,8 +69,15 @@ A simple platform helping rural communities easily find and access essential pro
    ```
 
 2. Install dependencies
-  ```bash
-   pnpm install
+```bash
+  # with pnpm
+pnpm install
+pnpm dev
+
+# or with npm
+npm install
+npm run dev
+
   ```
 
 3. Create a .env file in the root with the following variables:
@@ -63,27 +94,25 @@ pnpm dev
 5. Open http://localhost:3000 in your browser
 
 
-## API Endpoints
+## ⚙️ Environment Variables
 
-GET /api/services - List service types
+```bash
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+STRIPE_SECRET_KEY=your_stripe_secret
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
 
-GET /api/products - List available products
+## ✅ Future Improvements
 
-POST /api/register - User registration
-
-POST /api/login - User login
-
-GET /api/news - Static news headlines
-
-POST /api/contact - Submit contact form
-
-POST /api/bookings - Create a booking (auth required)
-
-GET /api/bookings - Get user bookings (auth required)
-
-PUT /api/user - Update user profile (auth required)
+- Add product categories & search
+- Integrate order tracking
+- Dark mode
 
 
-## License
+## 📜 License
 
 This project is for educational purposes only.
