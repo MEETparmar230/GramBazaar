@@ -14,7 +14,7 @@ interface JwtPayload {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
@@ -26,7 +26,8 @@ export async function GET(
     
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
     const userId = decoded.userId;
-    const bookingId = params.id;
+    const {id} = await params
+    const bookingId = id;
     
     // Find the booking and ensure it belongs to the user
     const booking = await Booking.findOne({ _id: bookingId, user: userId })
@@ -51,7 +52,7 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
@@ -63,7 +64,8 @@ export async function PATCH(
     
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
     const userId = decoded.userId;
-    const bookingId = params.id;
+    const {id} = await params
+    const bookingId = id;
     const updates = await req.json();
     
     // Find the booking and ensure it belongs to the user
