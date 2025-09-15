@@ -8,7 +8,7 @@ export default function page() {
   
   return (
     <div>
-      <section className='mt-10 mx-2'>
+      <section className='md:my-10 my-4 mx-2'>
                 <NewsCard/>
       </section>
     </div>

@@ -83,7 +83,7 @@ export default function BookingDetailsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-2xl md:mx-auto mx-2 mt-10 bg-white shadow rounded-xl ring-2 ring-green-200 mb-6">
+      <div className="max-w-2xl md:mx-auto mx-2 md:my-10 my-4 bg-white shadow rounded-xl ring-2 ring-green-200">
         <div className="p-6">
           <div className="mb-4 h-7 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-pulse w-60 rounded"></div>
           <div className="mb-2 h-6 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-pulse w-48 rounded"></div>
@@ -112,7 +112,7 @@ export default function BookingDetailsPage() {
   }
 
   return (
-    <div className="max-w-2xl md:mx-auto mx-2 mt-10 bg-white shadow rounded-xl ring-2 ring-green-200  mb-10">
+    <div className="max-w-2xl md:mx-auto mx-2 md:my-10 my-4 bg-white shadow rounded-xl ring-2 ring-green-200  ">
       <div className="p-6">
         <h1 className="text-xl font-bold mb-4">Booking Details</h1>
         <p className="text-gray-500 mb-2">Booking ID: {booking._id}</p>
@@ -153,7 +153,6 @@ export default function BookingDetailsPage() {
         </div>
       )}
       
-      {/* Show success message if payment completed */}
       {booking.paymentStatus === 'Completed' && (
         <div className="pb-6">
         <div className="mx-6 p-6 bg-green-50 border border-green-200 rounded-xl ">

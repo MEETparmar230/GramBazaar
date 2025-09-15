@@ -90,7 +90,7 @@ export default function EditServicePage() {
 
   if (loading) {
     return (
-    <div className="space-y-6 mx-auto min-w-fit max-w-1/3 bg-white p-5 rounded-lg my-5 ring-2 ring-green-200 animate-pulse">
+    <div className="space-y-6 md:mx-auto md:min-w-fit md:max-w-1/3 bg-white p-5 mx-2 rounded-lg md:my-10 my-4 ring-2 ring-green-200 animate-pulse">
       {/* Name */}
       <div className="space-y-2">
         <div className="h-4 w-20 bg-gray-300 rounded"></div>
@@ -120,7 +120,7 @@ export default function EditServicePage() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 mx-auto min-w-fit max-w-1/3 bg-white p-5 rounded-lg my-5 ring-2 ring-green-200">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 md:mx-auto md:min-w-fit md:max-w-1/3 mx-2 bg-white p-5 rounded-lg my-5 ring-2 ring-green-200">
         {/* Name */}
         <FormField
           control={form.control}

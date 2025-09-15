@@ -49,7 +49,6 @@ export default function ProductForm({ id }: { id: string }) {
   const [submitLoading, setSubmitLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [imageLoading, setImageLoading] = useState(false)
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -104,7 +103,7 @@ export default function ProductForm({ id }: { id: string }) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-7 mx-auto min-w-fit max-w-[33%] bg-white p-5 rounded-lg my-5 ring-2 ring-green-200"
+        className="space-y-7 md:mx-auto md:min-w-fit md:max-w-[33%] mx-2 bg-white p-5 rounded-lg md:my-10 my-4 ring-2 ring-green-200"
       >
         {/* Product Name */}
         <FormField

@@ -5,7 +5,7 @@ import React from 'react'
 
 export default function page() {
   return (
-    <div className='my-10 flex'>
+    <div className='md:my-10 my-7 flex'>
         <ContactForm/>
     </div>
   )

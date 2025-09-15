@@ -69,7 +69,7 @@ export default function ProductForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-7 mx-auto min-w-fit max-w-1/3 bg-white p-5 rounded-lg my-5 ring-2 ring-green-200"
+          className="space-y-7 md:mx-auto md:min-w-fit md:max-w-1/3 mx-2 bg-white p-5 rounded-lg md:my-10 my-4 ring-2 ring-green-200"
         >
           {/* Name */}
           <FormField

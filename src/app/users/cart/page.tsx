@@ -91,7 +91,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg ring-2 ring-green-200 my-6">
+    <div className="max-w-3xl md:mx-auto p-6 bg-white shadow-lg rounded-lg ring-2 ring-green-200 md:my-10 my-4 mx-2">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">🛒 Your Cart</h2>
       <div className="space-y-4">
         {cartItems.map((item) => (
@@ -119,10 +119,10 @@ export default function CartPage() {
         ))}
       </div>
       <div className="mt-6 flex justify-between items-center border-t pt-4">
-        <p className="text-lg font-bold text-gray-800">Total: ₹{totalAmount}</p>
+        <p className="md:text-lg font-bold text-gray-800">Total: ₹{totalAmount}</p>
         <button
           onClick={handleCheckout}
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+          className="bg-green-600 hover:bg-green-700 text-white md:px-6 px-3 py-2 rounded-lg font-semibold transition-colors"
         >
           Proceed to Checkout
         </button>

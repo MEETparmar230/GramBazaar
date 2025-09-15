@@ -72,7 +72,7 @@ export default function Dashboard() {
     };
 
     if (loading) return (
-        <div className="md:w-3/4 md:mx-auto lg:mx-auto mx-2 p-6 mt-10 mb-4 bg-white shadow rounded-lg ring-2 ring-green-200">
+        <div className="md:w-3/4 md:mx-auto lg:mx-auto mx-2 p-6 md:my-10 my-4 bg-white shadow rounded-lg ring-2 ring-green-200">
             {/* Header skeleton */}
             <div className="mb-4">
                 <div className="w-48 h-8 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-pulse rounded"></div>
@@ -134,7 +134,7 @@ export default function Dashboard() {
     )
 
     return (
-        <div className="md:w-3/4 md:mx-auto lg:mx-auto mx-2  p-6 mt-10 mb-4 bg-white shadow rounded-lg ring-2 ring-green-200">
+        <div className="md:w-3/4 md:mx-auto lg:mx-auto mx-2  p-6 md:my-10 my-4 bg-white shadow rounded-lg ring-2 ring-green-200">
             <h1 className="text-2xl font-bold mb-4">Welcome, {user.name} 👋</h1>
             <p className="mb-6 text-gray-600">Email: {user.email}</p>
 
