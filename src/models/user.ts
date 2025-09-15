@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import Booking from "./booking";
 
 const userSchema = new mongoose.Schema(
   {
@@ -12,13 +11,16 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
-// Correct middleware for handling user deletion
+// Handle cascade deletion without importing Booking model
 userSchema.post('findOneAndDelete', async function(doc) {
   if (doc) {
     try {
-      await Booking.deleteMany({ user: doc._id });
-      console.log(`Deleted all bookings for user ${doc._id}`);
+      // Use mongoose.models to access Booking model if it exists
+      const Booking = mongoose.models.Booking;
+      if (Booking) {
+        await Booking.deleteMany({ user: doc._id });
+        console.log(`Deleted all bookings for user ${doc._id}`);
+      }
     } catch (error) {
       console.error('Error deleting user bookings:', error);
     }
@@ -28,8 +30,12 @@ userSchema.post('findOneAndDelete', async function(doc) {
 // Additional middleware for other delete operations
 userSchema.post('deleteOne', { document: true, query: false }, async function() {
   try {
-    await Booking.deleteMany({ user: this._id });
-    console.log(`Deleted all bookings for user ${this._id}`);
+    // Use mongoose.models to access Booking model if it exists
+    const Booking = mongoose.models.Booking;
+    if (Booking) {
+      await Booking.deleteMany({ user: this._id });
+      console.log(`Deleted all bookings for user ${this._id}`);
+    }
   } catch (error) {
     console.error('Error deleting user bookings:', error);
   }

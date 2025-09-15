@@ -1,6 +1,9 @@
+// src/app/api/users/bookings/route.ts
+
 import { connectDB } from '@/lib/db';
 import Booking from '@/models/booking';
 import Product from '@/models/product';
+import User from '@/models/user'; // Import User to register schema
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
@@ -26,6 +29,12 @@ export async function POST(req: NextRequest) {
 
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
     const userId = decoded.userId;
+
+    // Verify user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
 
     const { items }: { items: BookingItemInput[] } = await req.json();
 
@@ -62,12 +71,27 @@ export async function POST(req: NextRequest) {
     await booking.save();
     await booking.populate("user", "name email");
 
-    return NextResponse.json({ message: "Booking created successfully", booking }, { status: 201 });
+    return NextResponse.json({ 
+      message: "Booking created successfully", 
+      booking 
+    }, { status: 201 });
   } catch (error) {
     console.error("Error creating booking:", error);
 
     if (error instanceof jwt.JsonWebTokenError) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    if (error instanceof Error) {
+      // Handle specific validation errors
+      if (error.message.includes('Invalid product')) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
+      
+      // Handle MongoDB validation errors
+      if (error.name === 'ValidationError') {
+        return NextResponse.json({ error: "Invalid booking data" }, { status: 400 });
+      }
     }
 
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -87,6 +111,7 @@ export async function GET(req: NextRequest) {
     const userId = decoded.userId;
 
     const bookings = await Booking.find({ user: userId })
+      .populate("user", "name email")
       .populate("items.productId", "name price")
       .sort({ createdAt: -1 });
 
@@ -98,10 +123,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    // Fallback without `any`
-    const message =
-      error instanceof Error ? error.message : "Internal server error";
-
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ 
+      error: error instanceof Error ? error.message : "Internal server error" 
+    }, { status: 500 });
   }
 }

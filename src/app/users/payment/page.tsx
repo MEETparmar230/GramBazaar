@@ -237,7 +237,7 @@ export default function PaymentPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-gray-50 py-6">
       <div className="container mx-auto px-4">
         <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">
       {/* Header skeleton */}
@@ -362,7 +362,7 @@ export default function PaymentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 py-6">
       <div className="container mx-auto px-4">
         <Elements 
           stripe={stripePromise} 
