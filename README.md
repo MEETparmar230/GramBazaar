@@ -63,9 +63,9 @@ It allows users to explore rural products, book and pay securely via Stripe Sand
 ## Setup and Run Locally
 
 1. Clone the repository  
-   ```bash
-   git clone https://github.com/MEETparmar230/GramBazaar
-   cd village-kart
+```bash
+git clone https://github.com/MEETparmar230/GramBazaar
+cd village-kart
    ```
 
 2. Install dependencies
