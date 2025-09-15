@@ -2,6 +2,14 @@
   import Stripe from "stripe";
   import Booking from "@/models/booking";
   import { connectDB } from "@/lib/db";
+import { Types } from "mongoose";
+
+  export interface BookingItem {
+  name: string;
+  price: number;
+  quantity: number;
+  productId: Types.ObjectId;
+}
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -26,7 +34,7 @@
         ui_mode: "embedded",
         mode: "payment",
         payment_method_types: ["card"],
-        line_items: booking.items.map((item: any) => ({
+        line_items: booking.items.map((item: BookingItem) => ({
           price_data: {
             currency: "inr",
             product_data: { name: item.name },
@@ -38,8 +46,9 @@
       });
 
       return NextResponse.json({ clientSecret: session.client_secret });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Stripe error:", err);
-      return NextResponse.json({ error: err.message }, { status: 500 });
+      const errorMessage = err instanceof Error ? err.message:"An unexpected error occurred"
+      return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
   }

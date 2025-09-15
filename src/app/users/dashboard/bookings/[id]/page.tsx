@@ -112,7 +112,7 @@ export default function BookingDetailsPage() {
   }
 
   return (
-    <div className="max-w-2xl md:mx-auto mx-2 mt-10 bg-white shadow rounded-xl ring-2 ring-green-200 mb-6 pb-2">
+    <div className="max-w-2xl md:mx-auto mx-2 mt-10 bg-white shadow rounded-xl ring-2 ring-green-200 mb-6 ">
       <div className="p-6">
         <h1 className="text-xl font-bold mb-4">Booking Details</h1>
         <p className="text-gray-500 mb-2">Booking ID: {booking._id}</p>

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-08-27.basil", // Always specify the API version
+  apiVersion: "2025-08-27.basil", 
 });
 
 export async function POST(req: NextRequest) {
@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     const { amount, currency = "inr" } = await req.json();
 
     // Validate amount
-    if (!amount || amount < 50) { // Minimum amount for Stripe is 50 INR
+    if (!amount || amount < 30) { 
       return NextResponse.json(
         { error: "Invalid amount. Minimum payment is 0.50 INR" },
         { status: 400 }
@@ -18,11 +18,11 @@ export async function POST(req: NextRequest) {
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount), // Ensure amount is an integer
+      amount: Math.round(amount), 
       currency: currency.toLowerCase(),
       payment_method_types: ["card"],
       metadata: {
-        // Add any metadata you need for your application
+        
       },
     });
 
@@ -30,10 +30,11 @@ export async function POST(req: NextRequest) {
       clientSecret: paymentIntent.client_secret,
       paymentIntentId: paymentIntent.id 
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Stripe error:", err);
+    const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred"
     return NextResponse.json(
-      { error: err.message || "Failed to create payment intent" }, 
+      { error: errorMessage || "Failed to create payment intent" }, 
       { status: 500 }
     );
   }

@@ -6,7 +6,15 @@ import axios from "axios";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-export default function EmbeddedCheckoutWrapper({ bookingId }: { bookingId: string }) {
+interface CheckoutSessionResponse {
+  clientSecret: string;
+}
+
+interface EmbeddedCheckoutWrapperProps {
+  bookingId: string;
+}
+
+export default function EmbeddedCheckoutWrapper({ bookingId }: EmbeddedCheckoutWrapperProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,12 +26,20 @@ export default function EmbeddedCheckoutWrapper({ bookingId }: { bookingId: stri
         setError(null);
         
         // Fixed API endpoint - matches your actual route
-        const { data } = await axios.post(`/api/users/bookings/${bookingId}/create-checkout-session`);
-        
+        const { data } = await axios.post<CheckoutSessionResponse>(`/api/users/bookings/${bookingId}/create-checkout-session`);
         setClientSecret(data.clientSecret);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Error creating session:", err);
-        setError(err.response?.data?.error || "Failed to create checkout session");
+        
+        let errorMessage = "Failed to create checkout session";
+        
+        if (axios.isAxiosError(err)) {
+          errorMessage = err.response?.data?.error || errorMessage;
+        } else if (err instanceof Error) {
+          errorMessage = err.message;
+        }
+        
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -48,8 +64,8 @@ export default function EmbeddedCheckoutWrapper({ bookingId }: { bookingId: stri
       <div className="p-8 text-center">
         <div className="text-red-500 mb-4">⚠️</div>
         <p className="text-red-600 mb-4">{error}</p>
-        <button 
-          onClick={() => window.location.reload()} 
+        <button
+          onClick={() => window.location.reload()}
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         >
           Try Again
