@@ -37,7 +37,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ 
         success: false, 
         paymentStatus: session.payment_status,
-        message: 'Payment not completed' 
+        error: 'Payment not completed' 
       }, { status: 400 });
     }
     

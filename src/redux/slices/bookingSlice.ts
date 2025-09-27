@@ -38,8 +38,11 @@ export const fetchBooking = createAsyncThunk(
     try {
       const res = await axios.get(`/api/users/bookings/${id}`);
       return res.data.booking;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.error || "Failed to fetch booking");
+    } catch (err: unknown) {
+      let message = "Payment confirmation failed"
+      if(err instanceof Error){message=err.message}
+      else if(axios.isAxiosError(err)){message=err.response?.data?.error}
+      return rejectWithValue(message|| "Failed to fetch booking");
     }
   }
 );
@@ -51,8 +54,11 @@ export const confirmPayment = createAsyncThunk(
     try {
       const res = await axios.post("/api/stripe/confirm", { session_id, bookingId });
       return res.data;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.error || "Payment confirmation failed");
+    } catch (err: unknown) {
+      let message = "Payment confirmation failed"
+      if(err instanceof Error){message=err.message}
+      else if(axios.isAxiosError(err)){message=err.response?.data?.error}
+      return rejectWithValue(message|| "Payment confirmation failed");
     }
   }
 );
