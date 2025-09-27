@@ -7,6 +7,10 @@ import axios from "axios";
 import { RiMenu2Fill } from "react-icons/ri";
 import { usePathname, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { clearUser, fetchUser } from "@/redux/slices/userSlice";
+import { AppDispatch, RootState } from "@/redux/store";
+import { clearBookings } from "@/redux/slices/bookingsSlice";
 
 type TypeOfSettings = {
   name:string,
@@ -15,37 +19,27 @@ type TypeOfSettings = {
 
 export default function Navbar() {
 
+  const { user, loading: userLoading } = useSelector((state: RootState) => state.user);
+  const loading = userLoading;
   const [menuOpen, setMenuOpen] = useState(false); 
-  const [role,setRole] = useState<"user"|"admin"|null>(null)
+  const role = userLoading ? null : user?.role;
   const [settings,setSettings] = useState<TypeOfSettings>()
   const router = useRouter();
-  const [loading,setLoading] = useState<boolean>(true)
   const pathname = usePathname();
 
+  const dispatch = useDispatch<AppDispatch>();
+
 useEffect(() => {
-
-  axios.get("/api/admin/settings")
-  .then((res)=>{
-      setSettings(res.data)
-  })
-  .catch(err=>console.log("Error while fetching settings",err))
-
-  axios.get("/api/profile")
-    .then((res) => {
-      setRole(res.data.user.role ?? null);
-    })
-    .catch(() => {
-      setRole(null);
-    })
-    .finally(()=>{setLoading(false)})
-}, []);
+  dispatch(fetchUser())
+}, [dispatch]);
 
 
   const handleLogout = async () => {
     try {
       await axios.post("/api/logout");
+          dispatch(clearUser()); 
+          dispatch(clearBookings());
       toast.success("Logged out!");
-      setRole(null);
       setMenuOpen(false);
       router.push("/");
     } catch (error) {

@@ -14,18 +14,20 @@ interface JwtPayload {
 export async function GET(req: Request) {
   try {
     await connectDB();
-
+    
     const cookie = req.headers.get('cookie') || '';
     const token = cookie.split('; ').find((c) => c.startsWith('token='))?.split('=')[1];
-
+    
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
+    
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
     const userId = decoded.userId;
-
-    const user = await User.findById(userId).select('name email phone');
+    
+    // Fixed: Include 'role' in the select statement
+    const user = await User.findById(userId).select('name email phone role');
+    
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
-
+    
     return NextResponse.json({ user });
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -39,27 +41,28 @@ export async function GET(req: Request) {
 export async function PUT(req: Request) {
   try {
     await connectDB();
-
+    
     const cookie = req.headers.get('cookie') || '';
     const token = cookie.split('; ').find((c) => c.startsWith('token='))?.split('=')[1];
-
+    
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
+    
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
     const userId = decoded.userId;
-
+    
     const { name, phone } = await req.json();
-
+    
     if (!name || !phone) {
       return NextResponse.json({ error: 'Missing name or phone' }, { status: 400 });
     }
-
+    
+    // Fixed: Include 'role' in the select statement
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { name, phone },
       { new: true, runValidators: true }
-    ).select('name email phone');
-
+    ).select('name email phone role');
+    
     return NextResponse.json({ user: updatedUser });
   } catch (error: unknown) {
     if (error instanceof Error) {

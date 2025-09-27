@@ -13,6 +13,6 @@ export async function GET() {
   }
   catch(err){
     console.error("Error while fetching products",err)
-    return NextResponse.json({message:"error while fetching products"},{status:500})
+    return NextResponse.json({error:"error while fetching products"},{status:500})
   }
 }

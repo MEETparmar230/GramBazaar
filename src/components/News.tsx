@@ -4,54 +4,43 @@ import axios from "axios";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-
-interface NewsType {
-  _id: string
-  title: string;
-  description: string;
-  date: string;
-  link: string
-}
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { fetchNews, removeNews, removeNewsLocal } from "@/redux/slices/newsSlice";
+import toast from "react-hot-toast";
 
 
 export default function NewsCard() {
 
-  const [news, setNews] = useState<NewsType[]>([])
-  const [role, setRole] = useState<"user" | "admin" | null>(null)
-  const [loading, setLoading] = useState(true);
-
+const dispatch = useDispatch<AppDispatch>()
+const {news,loading,deletingId,error} = useSelector((state:RootState)=>state.news)
+const role = useSelector((state:RootState)=>state.user.user?.role)
 
  const handleDelete = (id:string) =>{
-  try{
-    axios.delete(`/api/admin/news/${id}`)
-    alert("news deleted")
-  }
-  catch(err){
+ 
+    dispatch(removeNewsLocal(id))
+    dispatch(removeNews(id))
+    .unwrap()
+    .then(()=>toast.success("news deleted"))
+    .catch(err=>{
     console.error(err)
-    alert("Failed to delete product");
-  }
+    toast.error(err)
+    })
   }
 
   useEffect(() => {
-    axios.get("/api/news")
-      .then((res) => {
-        setNews(res.data)
-      })
+   
+    dispatch(fetchNews())
+    .unwrap()
       .catch((err) => {
-        console.error("Error while fetching news", err.response?.data || err.message)
+        console.error(err)
+        toast.error(err)
       })
-      .finally(()=>setLoading(false))
-      
-    axios.get("/api/profile")
-      .then(res => {
-        setRole(res.data.user?.role ?? null)
-        console.log(res.data.message)
-      })
-      .catch(err => {
-        console.error(err.response?.data || err.message)
-      })
-     
   }, [])
+
+  useEffect(()=>{
+     if (error) toast.error(error)
+  },[error])
 
 
 function NewsSkeletonCard() {
@@ -106,7 +95,7 @@ function NewsSkeletonCard() {
                 className="bg-red-600 hover:bg-red-700"
                 onClick={() => handleDelete(n._id)}
               >
-                Delete
+               {deletingId===n._id?"Deleting..." : "Delete"}
               </Button>
             </>
           )}

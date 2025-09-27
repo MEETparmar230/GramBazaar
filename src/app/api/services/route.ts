@@ -7,12 +7,12 @@ export async function GET() {
     try {
         const services = await Service.find({})
         if (services.length === 0) {
-            return NextResponse.json({ message: "No services found" }, { status: 404 })
+            return NextResponse.json({ error: "No services found" }, { status: 404 })
         }
         return NextResponse.json(services, {status: 200})
     }
     catch (err) {
         console.error("Error fetching services:", err)
-        return NextResponse.json({ message: "Internal server error" }, { status: 500 })
+        return NextResponse.json({ error: "Internal server error" }, { status: 500 })
     }
 }

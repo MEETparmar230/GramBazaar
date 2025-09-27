@@ -1,11 +1,19 @@
 'use client';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
-import { CartItemType } from '@/lib/validations/cart';
-import { useRouter } from 'next/navigation';
 
-// Skeleton component for loading state
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
+import {
+  fetchCart,
+  updateQuantityAsync,
+  removeItemAsync,
+  clearCartAsync,
+} from '@/redux/slices/cartSlice';
+import { RootState, AppDispatch } from '@/redux/store';
+import { CiTrash } from "react-icons/ci";
+
+// Skeletons
 const CartItemSkeleton = () => (
   <div className="flex flex-col sm:flex-row justify-between items-center p-4 border rounded-lg shadow-sm animate-pulse">
     <div className="flex-1 mb-2 sm:mb-0">
@@ -35,31 +43,47 @@ const CartSkeleton = () => (
 );
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState<CartItemType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
+  const { items: cartItems, loading, error } = useSelector(
+    (state: RootState) => state.cart
+  );
+
   useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        const res = await axios.get('/api/users/cart');
-        setCartItems(res.data.items || []);
-      } catch (err) {
-        toast.error('Failed to fetch cart');
-      } finally {
-        setLoading(false);
-      }
-    };
+    dispatch(fetchCart());
+  }, [dispatch]);
 
-    fetchCart();
-  }, []);
+  const handleQuantityChange = async (productId: string, quantity: number) => {
+    if (quantity < 1) return; // Prevent invalid quantities
+    
+    try {
+      await dispatch(updateQuantityAsync({ productId, quantity })).unwrap();
+      toast.success('Quantity updated');
+    } catch (error) {
+      toast.error('Failed to update quantity');
+      console.error('Update quantity error:', error);
+    }
+  };
 
-  const handleQuantityChange = (productId: string, quantity: number) => {
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.productId === productId ? { ...item, quantity } : item
-      )
-    );
+  const handleRemoveItem = async (productId: string) => {
+    try {
+      await dispatch(removeItemAsync(productId)).unwrap();
+      toast.success('Item removed from cart');
+    } catch (error) {
+      toast.error('Failed to remove item');
+      console.error('Remove item error:', error);
+    }
+  };
+
+  const handleClearCart = async () => {
+    try {
+      await dispatch(clearCartAsync()).unwrap();
+      toast.success('Cart cleared');
+    } catch (error) {
+      toast.error('Failed to clear cart');
+      console.error('Clear cart error:', error);
+    }
   };
 
   const totalAmount = cartItems.reduce(
@@ -67,13 +91,12 @@ export default function CartPage() {
     0
   );
 
-  const handleCheckout = () => { 
-    router.push('/users/payment'); // Removed total parameter as suggested
+  const handleCheckout = () => {
+    router.push('/users/payment');
   };
 
-  if (loading) {
-    return <CartSkeleton />;
-  }
+  if (loading) return <CartSkeleton />;
+  if (error) toast.error(error);
 
   if (!cartItems.length) {
     return (
@@ -92,7 +115,18 @@ export default function CartPage() {
 
   return (
     <div className="max-w-3xl md:mx-auto p-6 bg-white shadow-lg rounded-lg ring-2 ring-green-200 md:my-10 my-4 mx-2">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">🛒 Your Cart</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">🛒 Your Cart</h2>
+        {cartItems.length > 0 && (
+          <button
+            onClick={handleClearCart}
+            className="text-red-600 hover:text-red-700 text-sm font-medium border px-2 rounded-md border-red-500 hover:border-red-700"
+          >
+            Clear Cart
+          </button>
+        )}
+      </div>
+      
       <div className="space-y-4">
         {cartItems.map((item) => (
           <div
@@ -113,11 +147,21 @@ export default function CartPage() {
                 }
                 className="w-20 border rounded px-2 py-1 text-center focus:outline-none focus:ring-2 focus:ring-green-400"
               />
-              <span className="font-semibold text-gray-700">₹{item.price * item.quantity}</span>
+              <span className="font-semibold text-gray-700">
+                ₹{item.price * item.quantity}
+              </span>
+              <button
+                onClick={() => handleRemoveItem(item.productId)}
+                className="text-red-600 hover:text-red-800 font-bold px-2 py-1"
+                title="Remove item"
+              >
+                <CiTrash className='text-xl'/>
+              </button>
             </div>
           </div>
         ))}
       </div>
+      
       <div className="mt-6 flex justify-between items-center border-t pt-4">
         <p className="md:text-lg font-bold text-gray-800">Total: ₹{totalAmount}</p>
         <button

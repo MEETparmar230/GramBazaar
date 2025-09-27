@@ -12,7 +12,7 @@ export async function GET(){
 
         if(!news || news.length===0){
             console.log("unable extract News from Database")
-          return NextResponse.json({message:"unable extract News from Database"},{status:404})
+          return NextResponse.json({error:"unable extract News from Database"},{status:404})
         }
 
         return NextResponse.json(news,{status:200})
@@ -20,7 +20,7 @@ export async function GET(){
     }
     catch(err){
         console.error("Error while fetching News",err)
-        return NextResponse.json({message:"Server Error while fetching News"},{status:500})
+        return NextResponse.json({error:"Server Error while fetching News"},{status:500})
     }
 
 }

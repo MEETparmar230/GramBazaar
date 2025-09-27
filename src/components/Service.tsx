@@ -2,41 +2,41 @@
 
 import axios from "axios";
 import { CldImage } from "next-cloudinary";
-import { useEffect, useState } from "react";
+import { useEffect} from "react";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { fetchServices, removeService, removeServiceLocal } from "@/redux/slices/servicesSlice";
+import { fetchUser } from "@/redux/slices/userSlice";
+import toast from "react-hot-toast";
 
-interface ServiceType {
-  _id: string;
-  name: string;
-  imageId: string;
-}
+
 
 export default function Service() {
-  const [services, setServices] = useState<ServiceType[]>([]);
-  const [role, setRole] = useState<"user" | "admin" | null>(null);
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+ const {loading,services} = useSelector((state:RootState)=>state.services)
+ const role = useSelector((state:RootState)=>state.user.user?.role)
+ const dispatch = useDispatch<AppDispatch>()
 
   useEffect(() => {
-    Promise.all([axios.get("/api/services"), axios.get("/api/profile")])
-      .then(([servicesRes, profileRes]) => {
-        setServices(servicesRes.data);
-        setRole(profileRes.data.user?.role ?? null);
-      })
-      .catch((err) => console.error(err))
-      .finally(()=>{setLoading(false)})
+    dispatch(fetchServices())
+    dispatch(fetchUser())
   }, []);
 
   const handleDelete = (id: string) => {
-    axios
-      .delete(`/api/admin/services/${id}`)
-      .then(() => {
-        setServices((prev) => prev.filter((s) => s._id !== id));
-      })
-      .catch((err) => console.error(err))
-     
-  };
+  // Optimistic update
+  dispatch(removeServiceLocal(id));
+
+  // Async backend call
+  dispatch(removeService(id))
+    .unwrap()
+    .catch(() => {
+      toast.error("Failed to delete service");
+      dispatch(fetchServices()); 
+    });
+};
+
 
 function ServiceSkeletonCard() {
   return (

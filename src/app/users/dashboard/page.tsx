@@ -3,6 +3,11 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/redux/store';
+import { fetchUser, updateUserProfile } from '@/redux/slices/userSlice';
+import { fetchBookings } from '@/redux/slices/bookingsSlice';
+import toast from 'react-hot-toast';
 
 interface BookingItem {
     name: string;
@@ -15,7 +20,6 @@ interface Booking {
     items: BookingItem[];
 }
 
-// Helper function to merge duplicate items
 function mergeItems(items: BookingItem[]): BookingItem[] {
     const merged: Record<string, BookingItem> = {};
 
@@ -32,44 +36,40 @@ function mergeItems(items: BookingItem[]): BookingItem[] {
 }
 
 export default function Dashboard() {
-    const [user, setUser] = useState({ name: '', email: '', phone: '' });
-    const [bookings, setBookings] = useState<Booking[]>([]);
-    const [loading, setLoading] = useState(true);
+
+    const dispatch = useDispatch<AppDispatch>()
+
+    const {user,loading:userLoading} = useSelector((state:RootState)=>state.user)
+    const {bookings,loading:bookingsLoading} = useSelector((state:RootState)=>state.bookings)
 
     const [editName, setEditName] = useState('');
     const [editPhone, setEditPhone] = useState('');
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const userRes = await axios.get('/api/users/user');
-                const bookingRes = await axios.get('/api/users/bookings');
+   useEffect(()=>{
+    dispatch(fetchUser())
+    dispatch(fetchBookings())
+   },[dispatch])
 
-                setUser(userRes.data.user);
-                setBookings(bookingRes.data.bookings);
-                setEditName(userRes.data.user.name);
-                setEditPhone(userRes.data.user.phone);
-            } catch (err) {
-                console.error('Error loading dashboard:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, []);
+   useEffect(()=>{
+    if(user){
+        setEditName(user.name)
+        setEditPhone(user.phone)
+    }
+   },[user])
 
     const handleUpdate = async () => {
         try {
-            await axios.put('/api/users/user', {
-                name: editName,
-                phone: editPhone,
-            });
-            alert('Profile updated!');
+            await dispatch(updateUserProfile({name:editName,phone:editPhone})).unwrap()
+            toast.success('Profile updated!');
         } catch (err) {
-            alert('Failed to update profile.');
+            toast.error('Failed to update profile.');
         }
     };
+
+    const { error: userError } = useSelector((state: RootState) => state.user);
+    const { error: bookingsError } = useSelector((state: RootState) => state.bookings);
+
+    const loading = userLoading || bookingsLoading;
 
     if (loading) return (
         <div className="md:w-3/4 md:mx-auto lg:mx-auto mx-2 p-6 md:my-10 my-4 bg-white shadow rounded-lg ring-2 ring-green-200">
@@ -132,11 +132,13 @@ export default function Dashboard() {
             </div>
         </div>
     )
-
+if (userError || bookingsError) {
+  return <p className="text-red-500">Something went wrong loading the dashboard.</p>;
+}
     return (
         <div className="md:w-3/4 md:mx-auto lg:mx-auto mx-2  p-6 md:my-10 my-4 bg-white shadow rounded-lg ring-2 ring-green-200">
-            <h1 className="text-2xl font-bold mb-4">Welcome, {user.name} 👋</h1>
-            <p className="mb-6 text-gray-600">Email: {user.email}</p>
+            <h1 className="text-2xl font-bold mb-4">Welcome, {user?.name} 👋</h1>
+            <p className="mb-6 text-gray-600">Email: {user?.email}</p>
 
             <h2 className="text-lg font-semibold mb-3 flex items-center gap-2 text-zinc-800">📦 Your Bookings</h2>
 

@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
-import axios from "axios";
 import EmbeddedCheckoutWrapper from "@/components/EmbeddedCheckout";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { fetchBooking, confirmPayment } from '@/redux/slices/bookingSlice';
 
 interface BookingItem {
   name: string;
@@ -23,38 +25,27 @@ export default function BookingDetailsPage() {
   const { id } = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [booking, setBooking] = useState<Booking | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [processingPayment, setProcessingPayment] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
 
-  const fetchBooking = async () => {
-    try {
-      const res = await axios.get(`/api/users/bookings/${id}`);
-      setBooking(res.data.booking || res.data);
-    } catch (err) {
-      console.error("Error fetching booking:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { booking, loading, processingPayment, error } = useSelector(
+    (state: RootState) => state.booking
+  );
 
+  // Fetch booking data when component mounts or id changes
   useEffect(() => {
-    fetchBooking();
-  }, [id]);
+    if (id && typeof id === 'string') {
+      dispatch(fetchBooking(id));
+    }
+  }, [id, dispatch]);
 
   // Handle Stripe checkout session confirmation
   useEffect(() => {
     const session_id = searchParams.get("session_id");
-    if (session_id && !processingPayment) {
-      setProcessingPayment(true);
-      
-      axios
-        .post("/api/stripe/confirm", { session_id, bookingId: id })
-        .then(async (res) => {
-          console.log("✅ Payment confirmed:", res.data);
-          
-          // Refresh booking data
-          await fetchBooking();
+    if (session_id && id && typeof id === 'string' && !processingPayment) {
+      dispatch(confirmPayment({ session_id, bookingId: id }))
+        .unwrap()
+        .then(() => {
+          console.log("✅ Payment confirmed");
           
           // Redirect to success page after a short delay
           setTimeout(() => {
@@ -63,10 +54,9 @@ export default function BookingDetailsPage() {
         })
         .catch((err) => {
           console.error("❌ Confirm failed:", err);
-          setProcessingPayment(false);
         });
     }
-  }, [id, searchParams, router, processingPayment]);
+  }, [id, searchParams, router, processingPayment, dispatch]);
 
   // Show processing state when confirming payment
   if (processingPayment) {
@@ -107,12 +97,23 @@ export default function BookingDetailsPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="max-w-2xl md:mx-auto mx-2 mt-10 bg-white shadow rounded-xl ring-2 ring-red-200 mb-6">
+        <div className="p-6 text-center">
+          <h2 className="text-xl font-bold mb-2 text-red-600">Error</h2>
+          <p className="text-gray-600">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!booking) {
     return <p className="text-center text-2xl font-bold my-20">Booking not found.</p>;
   }
 
   return (
-    <div className="max-w-2xl md:mx-auto mx-2 md:my-10 my-4 bg-white shadow rounded-xl ring-2 ring-green-200  ">
+    <div className="max-w-2xl md:mx-auto mx-2 md:my-10 my-4 bg-white shadow rounded-xl ring-2 ring-green-200">
       <div className="p-6">
         <h1 className="text-xl font-bold mb-4">Booking Details</h1>
         <p className="text-gray-500 mb-2">Booking ID: {booking._id}</p>
@@ -155,15 +156,15 @@ export default function BookingDetailsPage() {
       
       {booking.paymentStatus === 'Completed' && (
         <div className="pb-6">
-        <div className="mx-6 p-6 bg-green-50 border border-green-200 rounded-xl ">
-          <div className="flex items-center">
-            <div className="text-green-500 text-2xl mr-3">✅</div>
-            <div>
-              <h3 className="text-lg font-semibold text-green-800">Payment Completed!</h3>
-              <p className="text-green-600">Your booking has been confirmed and payment processed successfully.</p>
+          <div className="mx-6 p-6 bg-green-50 border border-green-200 rounded-xl">
+            <div className="flex items-center">
+              <div className="text-green-500 text-2xl mr-3">✅</div>
+              <div>
+                <h3 className="text-lg font-semibold text-green-800">Payment Completed!</h3>
+                <p className="text-green-600">Your booking has been confirmed and payment processed successfully.</p>
+              </div>
             </div>
           </div>
-        </div>
         </div>
       )}
     </div>
