@@ -46,7 +46,7 @@ It allows users to explore rural products, book and pay securely via Stripe Sand
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** Next.js 15, React 19, TailwindCSS, ShadCN UI
+- **Frontend:** Next.js 15, React 19, TailwindCSS, ShadCN UI, Redux-Toolkit
 - **Backend:** Next.js API Routes (Node.js, Express-like)  
 - **Validation:** zod + React Hook Form
 - **ImageUpload:** Cloudinary
