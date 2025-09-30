@@ -44,6 +44,25 @@ It allows users to explore rural products, book and pay securely via Stripe Sand
     - Mark as read / delete single or multiple messages
 ---
 
+## 📸 Demo Screenshots
+
+# 🏠 User Dashboard
+![User Dashboard](./screenshots/user-dashboard.png)
+
+# 🛠️ Admin Dashboard
+![Admin Dashboard](./screenshots/admin-dashboard.png)
+
+# 👥 User Management
+![User Management](./screenshots/admin-user-management.png)
+
+# 💌 Contact Messages
+![Contact Messages](./screenshots/admin-messages.png)
+
+# 📦 Bookings Management
+![Bookings Management](./screenshots/admin-bookings.png)
+---
+
+
 ## 🛠️ Tech Stack
 
 - **Frontend:** Next.js 15, React 19, TailwindCSS, ShadCN UI, Redux-Toolkit
