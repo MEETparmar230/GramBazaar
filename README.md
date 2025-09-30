@@ -59,6 +59,21 @@ It allows users to explore rural products, book and pay securely via Stripe Sand
 
 --- 
 
+## login options
+
+```bash
+email:user@gmail.com
+password:user@123
+```
+
+## Payments
+
+```bash
+Card Number: 4242 4242 4242 4242
+Expiration: Any future date (MM/YY)
+CVC: Any 3 digits
+ZIP: Any 5 digits
+```
 
 ## Setup and Run Locally
 
