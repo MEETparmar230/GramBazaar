@@ -29,6 +29,13 @@ export default function Navbar() {
 
   const dispatch = useDispatch<AppDispatch>();
 
+  useEffect(()=> {
+     axios.get("/api/admin/settings")
+    .then(res=>{
+      setSettings(res.data)
+    })
+  },[])
+
 useEffect(() => {
   dispatch(fetchUser())
 }, [dispatch]);
@@ -94,7 +101,7 @@ useEffect(() => {
         {settings?.logo && (
           <img src={settings.logo} alt="Logo" className="h-8 inline-block" />
         )}
-        {settings?.name}
+        <h1 className="text-2xl">{settings?.name}</h1> 
       </>
     )}</Link></h1>
 
